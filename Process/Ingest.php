@@ -135,8 +135,12 @@ class Plants_Process_Ingest
         
         /* INGEST RESOURCES */
         
+        // Require Zend_Db_Expr for SQL expressions.
+        require_once 'Zend/Db/Expr.php';
+        
         // Save this search to the database.
-        $this->_db->insert('searches', array('query' => $searchQuery));
+        $this->_db->insert('searches', array('query' => $searchQuery, 
+                                             'inserted' => new Zend_Db_Expr('NOW()')));
         $searchId = $this->_db->lastInsertId();
         
         // Iterate the resource DOIs.
@@ -151,8 +155,10 @@ class Plants_Process_Ingest
                 continue;
             }
             
-            // Begin building this resource's metadata array.
-            $resource = array();
+            // Begin building this resource's metadata array, including DOI and 
+            // inserted timestamp.
+            $resource = array('doi' => $doi, 
+                              'inserted' => new Zend_Db_Expr('NOW()'));
             
             // Request the resource metadata.
             $this->_client->setUri(self::URL . self::PATH_CITATION);
@@ -167,9 +173,6 @@ class Plants_Process_Ingest
                                                'HTML-ENTITIES', 
                                                'UTF-8'));
             $xpath = new DOMXpath($doc);
-            
-            // Set resource DOI.
-            $resource['doi'] = $doi;
             
             // Set resource title.
             $div = $xpath->query('//div[@class="document-heading"]');

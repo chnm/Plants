@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Oct 20, 2010 at 03:36 PM
+-- Generation Time: Oct 20, 2010 at 06:03 PM
 -- Server version: 5.1.41
 -- PHP Version: 5.3.2-1ubuntu4.5
 
@@ -27,6 +27,8 @@ CREATE TABLE IF NOT EXISTS `geolocations` (
   `longitude` text COLLATE utf8_unicode_ci,
   `query` text COLLATE utf8_unicode_ci NOT NULL,
   `response` text COLLATE utf8_unicode_ci,
+  `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `inserted` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
@@ -78,6 +80,8 @@ CREATE TABLE IF NOT EXISTS `resources` (
   `notes` text COLLATE utf8_unicode_ci,
   `resource_type` text COLLATE utf8_unicode_ci,
   `title` text COLLATE utf8_unicode_ci,
+  `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `inserted` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`id`),
   UNIQUE KEY `doi` (`doi`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
@@ -96,6 +100,8 @@ CREATE TABLE IF NOT EXISTS `resources` (
 CREATE TABLE IF NOT EXISTS `searches` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `query` text COLLATE utf8_unicode_ci NOT NULL,
+  `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `inserted` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
@@ -120,5 +126,4 @@ CREATE TABLE IF NOT EXISTS `searches_resources` (
 --
 -- Dumping data for table `searches_resources`
 --
-
 

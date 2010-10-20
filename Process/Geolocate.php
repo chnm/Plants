@@ -42,6 +42,9 @@ class Plants_Process_Geolocate
                 )';
         $resources = $this->_db->fetchAll($sql, $this->_searchId);
         
+        // Require Zend_Db_Expr for SQL expressions.
+        require_once 'Zend/Db/Expr.php';
+        
         // Iterate all resources in this search.
         foreach ($resources as $resource) {
             
@@ -89,7 +92,8 @@ class Plants_Process_Geolocate
                 $geolocation = array('resource_id'            => $resource['id'], 
                                      'geolocation_service_id' => $serviceId, 
                                      'query'                  => $query, 
-                                     'response'               => $service->getResponse());
+                                     'response'               => $service->getResponse(), 
+                                     'inserted'               => new Zend_Db_Expr('NOW()'));
                 
                 // Set the latitude and longitude if they exist. If there 
                 // are no coordinates, set latitude and longitude to NULL. 
