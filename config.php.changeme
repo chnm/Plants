@@ -1,0 +1,26 @@
+<?php
+/* CONFIGURATION */
+
+// Path from root to directory containing Zend library.
+define('PATH_ZEND', '');
+
+// Path from root to directory containing Plants library (Git working tree).
+define('PATH_PLANTS', '');
+
+// Database connection configuration.
+define('DB_HOST', '');
+define('DB_USERNAME', '');
+define('DB_PASSWORD', '');
+define('DB_DBNAME', '');
+
+// JSTOR login configuration.
+define('JSTOR_USERNAME', '');
+define('JSTOR_PASSWORD', '');
+
+// Query parameters.
+$params = array(
+    'text' => 'rose', 
+    'resourceTypeId' => 397153,
+    //'herbariumId' => 405650, 
+    //'geographyId' => 6734,
+);

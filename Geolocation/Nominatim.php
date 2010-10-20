@@ -1,0 +1,53 @@
+<?php
+require_once 'Plants/Geolocation/Interface.php';
+class Plants_Geolocation_Nominatim implements Plants_Geolocation_Interface
+{
+    const NAME = 'OpenStreetMap Nominatim';
+    const URL = 'http://nominatim.openstreetmap.org/search';
+    
+    private $_response;
+    private $_result;
+    
+    public function __construct(Zend_Db_Adapter_Abstract $db)
+    {
+        require_once 'Zend/Http/Client.php';
+        $this->_client = new Zend_Http_Client(self::URL);
+        $this->_client->setConfig(array('keepalive' => true, 'timeout' => 100, 
+                                        'storeresponse' => false));
+        $this->_client->setParameterGet('format', 'json');
+    }
+    
+    public function query($location, $limit)
+    {
+        $this->_client->setParameterGet('limit', $limit);
+        $this->_client->setParameterGet('q', $location);
+        $response = $this->_client->request();
+        $this->_response = $response->getBody();
+        $this->_result = json_decode($response->getBody());
+    }
+    
+    public function getResponse()
+    {
+        return $this->_response;
+    }
+    
+    public function getTotalCount()
+    {
+        return count($this->_result);
+    }
+    
+    public function getLatitude($index)
+    {
+        return $this->_result[$index]->lat;
+    }
+    
+    public function getLongitude($index)
+    {
+        return $this->_result[$index]->lon;
+    }
+    
+    public function getLocation($index)
+    {
+        return $this->_result[$index]->display_name;
+    }
+}
