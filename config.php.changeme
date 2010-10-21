@@ -24,3 +24,21 @@ $params = array(
     //'herbariumId' => 405650, 
     //'geographyId' => 6734,
 );
+
+/* BOOTSTRAP - do not edit below this line */
+
+ini_set('display_errors', 1);
+
+set_include_path(get_include_path() 
+               . PATH_SEPARATOR . PATH_ZEND 
+               . PATH_SEPARATOR . PATH_PLANTS);
+
+// Set the database object.
+require_once 'Zend/Db.php';
+$db = Zend_Db::factory('Mysqli', array(
+    'host'     => DB_HOST, 
+    'username' => DB_USERNAME, 
+    'password' => DB_PASSWORD, 
+    'dbname'   => DB_DBNAME, 
+    'charset'  => 'utf8', // must include utf8 charset
+));
