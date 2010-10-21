@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Oct 20, 2010 at 06:03 PM
+-- Generation Time: Oct 21, 2010 at 07:08 PM
 -- Server version: 5.1.41
 -- PHP Version: 5.3.2-1ubuntu4.5
 
@@ -30,12 +30,7 @@ CREATE TABLE IF NOT EXISTS `geolocations` (
   `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `inserted` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
-
---
--- Dumping data for table `geolocations`
---
-
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=21289 ;
 
 -- --------------------------------------------------------
 
@@ -46,6 +41,7 @@ CREATE TABLE IF NOT EXISTS `geolocations` (
 CREATE TABLE IF NOT EXISTS `geolocation_services` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `class` text COLLATE utf8_unicode_ci NOT NULL,
+  `rank` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=4 ;
 
@@ -53,10 +49,10 @@ CREATE TABLE IF NOT EXISTS `geolocation_services` (
 -- Dumping data for table `geolocation_services`
 --
 
-INSERT INTO `geolocation_services` (`id`, `class`) VALUES
-(1, 'Plants_Geolocation_Nominatim'),
-(2, 'Plants_Geolocation_PlaceFinder'),
-(3, 'Plants_Geolocation_GeoNames');
+INSERT INTO `geolocation_services` (`id`, `class`, `rank`) VALUES
+(1, 'Plants_Geolocation_Nominatim', 3),
+(2, 'Plants_Geolocation_PlaceFinder', 1),
+(3, 'Plants_Geolocation_GeoNames', 2);
 
 -- --------------------------------------------------------
 
@@ -84,12 +80,7 @@ CREATE TABLE IF NOT EXISTS `resources` (
   `inserted` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`id`),
   UNIQUE KEY `doi` (`doi`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
-
---
--- Dumping data for table `resources`
---
-
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=7190 ;
 
 -- --------------------------------------------------------
 
@@ -103,12 +94,7 @@ CREATE TABLE IF NOT EXISTS `searches` (
   `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `inserted` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
-
---
--- Dumping data for table `searches`
---
-
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=3 ;
 
 -- --------------------------------------------------------
 
@@ -121,9 +107,4 @@ CREATE TABLE IF NOT EXISTS `searches_resources` (
   `search_id` int(10) unsigned NOT NULL,
   `resource_id` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
-
---
--- Dumping data for table `searches_resources`
---
-
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=7307 ;
