@@ -1,11 +1,12 @@
 <?php
 class Plants_Process_Ingest
 {
-    const URL           = 'http://plants.jstor.org/';
-    const PATH_SEARCH   = 'search';
-    const PATH_LOGIN    = 'action/doLogin';
-    const PATH_DOWNLOAD = 'action/batchDoisDataDownload';
-    const PATH_CITATION = 'action/showCitation';
+    const URL           = 'http://plants.jstor.org';
+    const PATH_SEARCH   = '/search';
+    const PATH_LOGIN    = '/action/doLogin';
+    const PATH_DOWNLOAD = '/action/batchDoisDataDownload';
+    const PATH_CITATION = '/action/showCitation';
+    const ID_RESOURCE_TYPE_SPECIMEN = 397153;
     
     private $_db;
     private $_username;
@@ -47,42 +48,29 @@ class Plants_Process_Ingest
         
         // Set the HTTP client.
         require_once 'Zend/Http/Client.php';
-        $this->_client = new Zend_Http_Client;
+        $this->_client = new Zend_Http_Client(self::URL);
         $this->_client->setConfig(array('keepalive' => true, 
                                         'timeout' => 100, 
                                         'storeresponse' => false)); // attempt to reduce memory load
         $this->_client->setCookieJar();
     }
     
-    public function ingest(array $params, $returnTotalCount = false)
+    public function ingest($searchUrl, $returnTotalCount = false)
     {
         /* SEARCH JSTOR */
         
-        // Set the search parameters.
-        $queryPrefix = array();
-        foreach ($this->_parameterFields as $key => $value) {
-            if (isset($params[$key])) {
-                // "st" parameters are special cases.
-                if ('st' == $value) {
-                    $queryPrefix[] = 'st=' . urlencode($params[$key]);
-                } else {
-                    $parameters[$value] = $params[$key];
-                }
-            }
+        require_once 'Zend/Uri.php';
+        $uri = Zend_Uri::factory($searchUrl);
+        if (!preg_match('/=' . self::ID_RESOURCE_TYPE_SPECIMEN . '\b/', $uri->getQuery())) {
+            throw new Exception('Invalid search. Only searches on "Resource Type: Specimens" will be geolocated.');
         }
-        
-        // Zend_Http_Client does not allow duplicate GET keys, following HTTP 
-        // specification. JSTOR uses duplicate keys for certain search fields. 
-        // Need to build a URL query prefix to compensate.
-        $queryPrefix = '?' . implode('&', $queryPrefix);
         
         // Perform the search but don't parse the results. JSTOR must store the 
         // previous search in a cookie.
-        $this->_client->setUri(self::URL . self::PATH_SEARCH . $queryPrefix);
-        $this->_client->setParameterGet($parameters);
+        $this->_client->setUri(self::URL);
+        $this->_client->getUri()->setPath(self::PATH_SEARCH);
+        $this->_client->getUri()->setQuery($uri->getQuery());
         $response = $this->_client->request();
-        // Store the search query for later.
-        $searchQuery = $this->_client->getUri()->getQuery();
         $this->_client->resetParameters();
         
         // Return total count if desired.
@@ -93,13 +81,14 @@ class Plants_Process_Ingest
             // Firefox adds tbody so don't include it in the XPath.
             $results = $xpath->query('/html/body/table/tr[2]/td[3]/article/nav');
             preg_match('/^\s+([\d,]+) Results/', $results->item(0)->nodeValue, $matches);
-            return (int) str_replace(',', '', $matches[1]);
+            return (int) @str_replace(',', '', $matches[1]);
         }
         
         /* LOGIN TO JSTOR*/
         
         // Login to JSTOR to access the XLS download action.
-        $this->_client->setUri(self::URL . self::PATH_LOGIN);
+        $this->_client->setUri(self::URL);
+        $this->_client->getUri()->setPath(self::PATH_LOGIN);
         $this->_client->setParameterPost(array('login' => $this->_username, 
                                                'password' => $this->_password, 
                                                'submit' => 'true'));
@@ -110,7 +99,8 @@ class Plants_Process_Ingest
         
         // Download the XLS file containing every DOI in the result set of the 
         // previous search.
-        $this->_client->setUri(self::URL . self::PATH_DOWNLOAD);
+        $this->_client->setUri(self::URL);
+        $this->_client->getUri()->setPath(self::PATH_DOWNLOAD);
         $this->_client->setParameterGet('downtr', 'downloadAllDois');
         $response = $this->_client->request();
         $this->_client->resetParameters();
@@ -139,7 +129,7 @@ class Plants_Process_Ingest
         require_once 'Zend/Db/Expr.php';
         
         // Save this search to the database.
-        $this->_db->insert('searches', array('query' => $searchQuery, 
+        $this->_db->insert('searches', array('jstor_url' => $searchUrl, 
                                              'inserted' => new Zend_Db_Expr('NOW()')));
         $searchId = $this->_db->lastInsertId();
         
@@ -161,9 +151,11 @@ class Plants_Process_Ingest
                               'inserted' => new Zend_Db_Expr('NOW()'));
             
             // Request the resource metadata.
-            $this->_client->setUri(self::URL . self::PATH_CITATION);
+            $this->_client->setUri(self::URL);
+            $this->_client->getUri()->setPath(self::PATH_CITATION);
             $this->_client->setParameterGet('doi', $doi);
             $response = $this->_client->request();
+            $this->_client->resetParameters();
             
             $doc = new DOMDocument();
             // Must convert HTML entities to UTF-8 before loading into DOM. 

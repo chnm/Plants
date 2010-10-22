@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Oct 22, 2010 at 01:19 PM
+-- Generation Time: Oct 22, 2010 at 04:37 PM
 -- Server version: 5.1.41
 -- PHP Version: 5.3.2-1ubuntu4.5
 
@@ -19,7 +19,7 @@ SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 -- Table structure for table `geolocations`
 --
 
-CREATE TABLE IF NOT EXISTS `geolocations` (
+CREATE TABLE `geolocations` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `resource_id` int(10) unsigned NOT NULL,
   `geolocation_service_id` int(10) unsigned NOT NULL,
@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS `geolocations` (
   `inserted` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`id`),
   UNIQUE KEY `resource_id` (`resource_id`,`geolocation_service_id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=21303 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -39,12 +39,12 @@ CREATE TABLE IF NOT EXISTS `geolocations` (
 -- Table structure for table `geolocation_services`
 --
 
-CREATE TABLE IF NOT EXISTS `geolocation_services` (
+CREATE TABLE `geolocation_services` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `class` text COLLATE utf8_unicode_ci NOT NULL,
   `rank` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=4 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
 -- Dumping data for table `geolocation_services`
@@ -61,7 +61,7 @@ INSERT INTO `geolocation_services` (`id`, `class`, `rank`) VALUES
 -- Table structure for table `resources`
 --
 
-CREATE TABLE IF NOT EXISTS `resources` (
+CREATE TABLE `resources` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `doi` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
   `collection_year` text COLLATE utf8_unicode_ci,
@@ -81,7 +81,7 @@ CREATE TABLE IF NOT EXISTS `resources` (
   `inserted` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`id`),
   UNIQUE KEY `doi` (`doi`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=7190 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -89,13 +89,13 @@ CREATE TABLE IF NOT EXISTS `resources` (
 -- Table structure for table `searches`
 --
 
-CREATE TABLE IF NOT EXISTS `searches` (
+CREATE TABLE `searches` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `query` text COLLATE utf8_unicode_ci NOT NULL,
+  `jstor_url` text COLLATE utf8_unicode_ci NOT NULL,
   `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `inserted` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=2 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -103,10 +103,10 @@ CREATE TABLE IF NOT EXISTS `searches` (
 -- Table structure for table `searches_resources`
 --
 
-CREATE TABLE IF NOT EXISTS `searches_resources` (
+CREATE TABLE `searches_resources` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `search_id` int(10) unsigned NOT NULL,
   `resource_id` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `search_id` (`search_id`,`resource_id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=7190 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
