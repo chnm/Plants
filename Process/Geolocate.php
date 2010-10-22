@@ -2,15 +2,13 @@
 class Plants_Process_Geolocate
 {
     private $_db;
-    private $_searchId;
     
-    public function __construct(Zend_Db_Adapter_Abstract $db, $searchId)
+    public function __construct(Zend_Db_Adapter_Abstract $db)
     {
         $this->_db = $db;
-        $this->_searchId = $searchId;
     }
     
-    public function geolocate()
+    public function geolocate($searchId)
     {
         // Find all geolocation services
         $sql = 'SELECT * FROM geolocation_services';
@@ -32,15 +30,15 @@ class Plants_Process_Geolocate
         
         // Find all resources in this search.
         $sql = 'SELECT r.id, r.locality, r.country 
-                FROM searches_resources sr 
-                JOIN resources r 
-                ON sr.resource_id = r.id 
-                WHERE search_id = ? 
+                FROM resources r 
+                JOIN searches_resources sr 
+                ON r.id = sr.resource_id
+                WHERE sr.search_id = ? 
                 AND (
-                    locality IS NOT NULL 
-                    OR country IS NOT NULL 
+                    r.locality IS NOT NULL 
+                    OR r.country IS NOT NULL 
                 )';
-        $resources = $this->_db->fetchAll($sql, $this->_searchId);
+        $resources = $this->_db->fetchAll($sql, $searchId);
         
         // Require Zend_Db_Expr for SQL expressions.
         require_once 'Zend/Db/Expr.php';
@@ -63,16 +61,12 @@ class Plants_Process_Geolocate
                 
                 // Find whether the geolocation exists for the resource using 
                 // the specified geolocation service.
-                $sql = 'SELECT r.id
-                        FROM resources r 
-                        JOIN geolocations g 
-                        ON r.id = g.resource_id 
-                        WHERE r.id = ? 
-                        AND g.geolocation_service_id = ? 
-                        LIMIT 1';
-                $geolocationExists = $this->_db->fetchOne($sql, 
-                                                          array($resource['id'], 
-                                                          $serviceId));
+                $sql = 'SELECT g.id
+                        FROM geolocations g 
+                        WHERE g.resource_id = ? 
+                        AND g.geolocation_service_id = ?';
+                $geolocationExists = $this->_db->fetchOne($sql, array($resource['id'], 
+                                                                      $serviceId));
                 
                 // Do not geolocate if it already exists for this resource.
                 if ($geolocationExists) {
