@@ -85,7 +85,7 @@ class Plants_Process_Geolocate
                 // Set the geolocation array.
                 $geolocation = array('resource_id'            => $resource['id'], 
                                      'geolocation_service_id' => $serviceId, 
-                                     'query'                  => $query, 
+                                     'request_uri'            => $service->getRequestUri(), 
                                      'response'               => $service->getResponse(), 
                                      'inserted'               => new Zend_Db_Expr('NOW()'));
                 

@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Oct 22, 2010 at 04:37 PM
+-- Generation Time: Oct 22, 2010 at 06:33 PM
 -- Server version: 5.1.41
 -- PHP Version: 5.3.2-1ubuntu4.5
 
@@ -25,7 +25,7 @@ CREATE TABLE `geolocations` (
   `geolocation_service_id` int(10) unsigned NOT NULL,
   `latitude` text COLLATE utf8_unicode_ci,
   `longitude` text COLLATE utf8_unicode_ci,
-  `query` text COLLATE utf8_unicode_ci NOT NULL,
+  `request_uri` text COLLATE utf8_unicode_ci NOT NULL,
   `response` text COLLATE utf8_unicode_ci,
   `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `inserted` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',

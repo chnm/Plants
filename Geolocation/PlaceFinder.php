@@ -5,15 +5,14 @@ class Plants_Geolocation_PlaceFinder implements Plants_Geolocation_Interface
     const NAME = 'Yahoo! PlaceFinder';
     const URL = 'http://where.yahooapis.com/geocode';
     
-    private $_response;
+    private $_client;
     private $_result;
     
     public function __construct(Zend_Db_Adapter_Abstract $db)
     {
         require_once 'Zend/Http/Client.php';
         $this->_client = new Zend_Http_Client(self::URL);
-        $this->_client->setConfig(array('keepalive' => true, 'timeout' => 100, 
-                                        'storeresponse' => false));
+        $this->_client->setConfig(array('keepalive' => true, 'timeout' => 100));
         $this->_client->setParameterGet('flags', 'J'); // JSON format
     }
     
@@ -24,13 +23,18 @@ class Plants_Geolocation_PlaceFinder implements Plants_Geolocation_Interface
         $this->_client->setParameterGet('count', $limit);
         $this->_client->setParameterGet('q', $location);
         $response = $this->_client->request();
-        $this->_response = $response->getBody();
         $this->_result = json_decode($response->getBody());
+    }
+    
+    public function getRequestUri()
+    {
+        preg_match('/GET (.+) /', $this->_client->getLastRequest(), $matches);
+        return $matches[1];
     }
     
     public function getResponse()
     {
-        return $this->_response;
+        return $this->_client->getLastResponse()->getBody();
     }
     
     public function getTotalCount()
