@@ -8,7 +8,7 @@ class Plants_Geolocation_PlaceFinder implements Plants_Geolocation_Interface
     private $_client;
     private $_result;
     
-    public function __construct(Zend_Db_Adapter_Abstract $db)
+    public function __construct()
     {
         require_once 'Zend/Http/Client.php';
         $this->_client = new Zend_Http_Client(self::URL);

@@ -22,7 +22,7 @@ class Plants_Process_Geolocate
             
             // Geolocation service classes must implement 
             // Plants_Geolocation_Interface. Ignore ones that do not.
-            $class = new $geolocationService['class']($this->_db);
+            $class = new $geolocationService['class'];
             if ($class instanceof Plants_Geolocation_Interface) {
                 $services[$geolocationService['id']] = $class;
             }
