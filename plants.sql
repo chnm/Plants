@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Oct 22, 2010 at 06:33 PM
+-- Generation Time: Oct 24, 2010 at 07:30 PM
 -- Server version: 5.1.41
 -- PHP Version: 5.3.2-1ubuntu4.5
 
@@ -41,7 +41,8 @@ CREATE TABLE `geolocations` (
 
 CREATE TABLE `geolocation_services` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `class` text COLLATE utf8_unicode_ci NOT NULL,
+  `name` text COLLATE utf8_unicode_ci NOT NULL,
+  `class_suffix` text COLLATE utf8_unicode_ci NOT NULL,
   `rank` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -50,10 +51,10 @@ CREATE TABLE `geolocation_services` (
 -- Dumping data for table `geolocation_services`
 --
 
-INSERT INTO `geolocation_services` (`id`, `class`, `rank`) VALUES
-(1, 'Plants_Geolocation_Nominatim', 3),
-(2, 'Plants_Geolocation_PlaceFinder', 1),
-(3, 'Plants_Geolocation_GeoNames', 2);
+INSERT INTO `geolocation_services` (`id`, `name`, `class_suffix`, `rank`) VALUES
+(1, 'OpenStreetMap Nominatim', 'Nominatim', 3),
+(2, 'Yahoo! PlaceFinder', 'PlaceFinder', 1),
+(3, 'GeoNames', 'GeoNames', 2);
 
 -- --------------------------------------------------------
 

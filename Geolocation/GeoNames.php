@@ -2,7 +2,6 @@
 require_once 'Plants/Geolocation/Interface.php';
 class Plants_Geolocation_GeoNames implements Plants_Geolocation_Interface
 {
-    const NAME = 'GeoNames';
     const URL = 'http://ws.geonames.org/search';
     
     private $_client;

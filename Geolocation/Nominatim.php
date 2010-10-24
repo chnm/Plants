@@ -2,7 +2,6 @@
 require_once 'Plants/Geolocation/Interface.php';
 class Plants_Geolocation_Nominatim implements Plants_Geolocation_Interface
 {
-    const NAME = 'OpenStreetMap Nominatim';
     const URL = 'http://nominatim.openstreetmap.org/search';
     
     private $_client;

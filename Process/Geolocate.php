@@ -1,6 +1,8 @@
 <?php
 class Plants_Process_Geolocate
 {
+    const CLASS_PREFIX = 'Plants_Geolocation_';
+    
     private $_db;
     
     public function __construct(Zend_Db_Adapter_Abstract $db)
@@ -14,15 +16,17 @@ class Plants_Process_Geolocate
         $sql = 'SELECT * FROM geolocation_services';
         $geolocationServices = $this->_db->fetchAll($sql);
         
-        // Require the geolocation service classes and instantiate them.
+        // Iterate the geolocation services.
         $services = array();
         foreach ($geolocationServices as $geolocationService) {
-            require_once str_replace('_', DIRECTORY_SEPARATOR, 
-                                     $geolocationService['class']) . '.php';
+            
+            // Set the class name, require the classes and instantiate them.
+            $className = self::CLASS_PREFIX . $geolocationService['class_suffix']);
+            require_once str_replace('_', DIRECTORY_SEPARATOR, $className . '.php';
             
             // Geolocation service classes must implement 
             // Plants_Geolocation_Interface. Ignore ones that do not.
-            $class = new $geolocationService['class'];
+            $class = new $className;
             if ($class instanceof Plants_Geolocation_Interface) {
                 $services[$geolocationService['id']] = $class;
             }

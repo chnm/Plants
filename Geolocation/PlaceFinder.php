@@ -2,7 +2,6 @@
 require_once 'Plants/Geolocation/Interface.php';
 class Plants_Geolocation_PlaceFinder implements Plants_Geolocation_Interface
 {
-    const NAME = 'Yahoo! PlaceFinder';
     const URL = 'http://where.yahooapis.com/geocode';
     
     private $_client;
