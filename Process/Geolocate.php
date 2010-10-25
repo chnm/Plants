@@ -21,8 +21,8 @@ class Plants_Process_Geolocate
         foreach ($geolocationServices as $geolocationService) {
             
             // Set the class name, require the classes and instantiate them.
-            $className = self::CLASS_PREFIX . $geolocationService['class_suffix']);
-            require_once str_replace('_', DIRECTORY_SEPARATOR, $className . '.php';
+            $className = self::CLASS_PREFIX . $geolocationService['class_suffix'];
+            require_once str_replace('_', DIRECTORY_SEPARATOR, $className . '.php');
             
             // Geolocation service classes must implement 
             // Plants_Geolocation_Interface. Ignore ones that do not.
