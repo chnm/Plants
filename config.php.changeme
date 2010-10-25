@@ -17,14 +17,6 @@ define('DB_DBNAME', '');
 define('JSTOR_USERNAME', '');
 define('JSTOR_PASSWORD', '');
 
-// Query parameters.
-$params = array(
-    'text' => 'rose', 
-    'resourceTypeId' => 397153,
-    //'herbariumId' => 405650, 
-    //'geographyId' => 6734,
-);
-
 /* BOOTSTRAP - do not edit below this line */
 
 ini_set('display_errors', 1);
