@@ -1,15 +1,32 @@
 <?php
+/**
+ * This class defines an object that geolocates resources ingested from the 
+ * JSTOR Plant Science database. It can query multiple multiple geolocation 
+ * service APIs.
+ * 
+ * @link http://plants.jstor.org/
+ */
 class Plants_Process_Geolocate
 {
     const CLASS_PREFIX = 'Plants_Geolocation_';
     
     private $_db;
     
+    /**
+     * Construct the geolocate object.
+     * 
+     * @param Zend_Db_Adapter_Abstract $db
+     */
     public function __construct(Zend_Db_Adapter_Abstract $db)
     {
         $this->_db = $db;
     }
     
+    /**
+     * Geolocate the resources in the provided search.
+     * 
+     * @param int $searchId
+     */
     public function geolocate($searchId)
     {
         // Find all geolocation services

@@ -1,5 +1,11 @@
 <?php
 require_once 'Plants/Geolocation/Interface.php';
+
+/**
+ * This class defines a PlaceFinder object.
+ * 
+ * @link http://developer.yahoo.com/geo/placefinder/guide/
+ */
 class Plants_Geolocation_PlaceFinder implements Plants_Geolocation_Interface
 {
     const URL = 'http://where.yahooapis.com/geocode';

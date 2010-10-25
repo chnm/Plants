@@ -1,4 +1,10 @@
 <?php
+/**
+ * This class defines an object that ingests result sets from a search on the 
+ * JSTOR Plant Science database.
+ * 
+ * @link http://plants.jstor.org/ 
+ */
 class Plants_Process_Ingest
 {
     const URL           = 'http://plants.jstor.org';
@@ -37,6 +43,13 @@ class Plants_Process_Ingest
         'resource_type'       => 'Resource Type', 
     );
     
+    /**
+     * Construct the ingest object.
+     * 
+     * @param Zend_Db_Adapter_Abstract $db
+     * @param string $username The JSTOR username.
+     * @param string $password The JSTOR password.
+     */
     public function __construct(Zend_Db_Adapter_Abstract $db, $username, $password)
     {
         // http://www.php.net/manual/en/domdocument.loadhtml.php#95463
@@ -55,6 +68,14 @@ class Plants_Process_Ingest
         $this->_client->setCookieJar();
     }
     
+    /**
+     * Search JSTOR and ingest the results.
+     * 
+     * @param string $searchUrl The URL of a JSTOR search results page.
+     * @param bool $returnTotalCount Return the total count of the result set 
+     * instead of ingesting it.
+     * @return string|int The search ID or the total count of the result set.
+     */
     public function ingest($searchUrl, $returnTotalCount = false)
     {
         /* SEARCH JSTOR */

@@ -1,5 +1,11 @@
 <?php
 require_once 'Plants/Geolocation/Interface.php';
+
+/**
+ * This class defines a GeoNames object.
+ * 
+ * @link http://www.geonames.org/export/web-services.html
+ */
 class Plants_Geolocation_GeoNames implements Plants_Geolocation_Interface
 {
     const URL = 'http://ws.geonames.org/search';

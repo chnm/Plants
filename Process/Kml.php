@@ -1,4 +1,11 @@
 <?php
+/**
+ * This class describes an object that writes Keyhole Markup Language (KML) for 
+ * geolocated resources ingested from the JSTOR Plant Science database.
+ * 
+ * @link http://plants.jstor.org/
+ * @link http://code.google.com/apis/kml/documentation/
+ */
 class Plants_Process_Kml extends XMLWriter
 {
     private $_db;
@@ -12,6 +19,11 @@ class Plants_Process_Kml extends XMLWriter
                                    'url'             => 'URL');
 
     
+    /**
+     * Construct the KML object.
+     * 
+     * @param Zend_Db_Adapter_Abstract $db
+     */
     public function __construct(Zend_Db_Adapter_Abstract $db)
     {
         $this->_db = $db;
@@ -28,10 +40,12 @@ class Plants_Process_Kml extends XMLWriter
      * Writes KML during runtime.
      * 
      * @todo This method of getting geolocations based on rank is sub-optimal. 
-     *       Tried optimizing the SQL to one statement using IF, CASE, UNION, 
-     *       and GROUP BY with no success.
-     * @param int $searchId The search ID.
+     * Tried optimizing the SQL to one statement using IF, CASE, UNION, and 
+     * GROUP BY with no success. Continue exploring other ways.
+     * @param int $searchId The search ID from which to generate the KML.
      * @param int $limit The maximum amount of results.
+     * @param bool $xmlContentType Whether to include a text/xml content type
+     * header prior to XML output.
      */
     public function write($searchId, $limit = 200, $xmlContentType = false)
     {

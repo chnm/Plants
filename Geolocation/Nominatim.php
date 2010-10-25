@@ -1,5 +1,11 @@
 <?php
 require_once 'Plants/Geolocation/Interface.php';
+
+/**
+ * This class defines a Nominatim object.
+ * 
+ * @link http://wiki.openstreetmap.org/wiki/Nominatim
+ */
 class Plants_Geolocation_Nominatim implements Plants_Geolocation_Interface
 {
     const URL = 'http://nominatim.openstreetmap.org/search';
