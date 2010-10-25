@@ -1,5 +1,5 @@
 <?php
-class Process_Kml extends XMLWriter
+class Plants_Process_Kml extends XMLWriter
 {
     private $_db;
     private $_services;
