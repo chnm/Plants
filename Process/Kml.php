@@ -33,8 +33,10 @@ class Process_Kml extends XMLWriter
      * @param int $searchId The search ID.
      * @param int $limit The maximum amount of results.
      */
-    public function write($searchId, $limit = 200)
+    public function write($searchId, $limit = 200, $xmlContentType = false)
     {
+        /* GET GEOLOCATION DATA */
+        
         // Fetch all resources for this search. Must limit total count to reduce 
         // memory load, which is considerable on large datasets.
         $sql = 'SELECT r.* 
@@ -90,6 +92,13 @@ class Process_Kml extends XMLWriter
                                     'latitude'        => $geolocation['latitude'], 
                                     'longitude'       => $geolocation['longitude'], 
                                     'url'             => $url);
+        }
+        
+        /* WRITE KML */
+        
+        // Content type must be text/xml to render properly in browsers.
+        if ($xmlContentType) {
+            header ('Content-Type: text/xml');
         }
         
         // Google Maps parses out HTML from all elements. The only exception to 
