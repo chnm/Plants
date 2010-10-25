@@ -37,7 +37,7 @@ class Process_Kml extends XMLWriter
     {
         // Fetch all resources for this search. Must limit total count to reduce 
         // memory load, which is considerable on large datasets.
-        $sql = 'SELECT * 
+        $sql = 'SELECT r.* 
                 FROM resources r
                 JOIN searches_resources sr 
                 ON r.id = sr.resource_id 
