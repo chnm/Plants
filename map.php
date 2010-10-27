@@ -104,10 +104,9 @@ function getCollectionYears() {
         }
     });
     $.each(collectionYears.sort(), function (index, value) {
-        $("#content-window").append($("<a>", {
-            onclick: "mapCollectionYears(" + value + ")", 
-            text: value
-        }));
+        // Adding onclick to $("<a>") selector works in Firefox, but not in 
+        // Chrome. Must write out the entire tag.
+        $("#content-window").append($("<a href=\"#\" onclick=\"mapCollectionYears(" + value + ")\">" + value + "</a>"));
         $("#content-window").append($("<br />"));
     });
 }
@@ -126,11 +125,11 @@ function mapCollectionYears(value) {
     <div id="map" style="width:79%; height:100%; float:left"></div>
     <div id="content-window" style="width:19%; height:100%; float:left">
         <button onclick="alert(kml);">Check for KML</button>
-        <button onclick="mapParse();">Parse KML</button>
+        <button onclick="parseKml();">Parse KML</button>
         <button onclick="mapKml();">Map KML</button>
         <button onclick="getHerbariums();">Get Herbariums</button>
         <button onclick="getCollectionYears();">Get Collection Years</button>
         <button onclick="deleteMarkers();">Delete Markers</button>
     </div>
-    <!--<div id='kml'></div>-->
+    <div id='kml'></div>
 </body>
