@@ -74,7 +74,7 @@ class Plants_Process_Kml extends XMLWriter
             
             // Add the geolocation to this search.
             $geolocations[] = array('name'            => $resource['title'], 
-                                    'herbarium'       => $resource['herbarium'], 
+                                    'herbarium'       => $resource['herbarium_name'], 
                                     'collector'       => $resource['collector'], 
                                     'locality'        => $resource['locality'], 
                                     'country'         => $resource['country'], 

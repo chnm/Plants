@@ -18,16 +18,6 @@ class Plants_Process_Ingest
     private $_username;
     private $_password;
     
-    // [local name] => [JSTOR name, GET query]
-    private $_parameterFields = array(
-        'collector'      => 'Collector_fld', 
-        'date'           => 'Date_fld', 
-        'geographyId'    => 'st', 
-        'herbariumId'    => 'st', 
-        'resourceTypeId' => 't', 
-        'text'           => 'searchText', 
-    );
-    
     // [local name] => [JSTOR name, XPath].
     private $_metadataFields = array(
         'collection'          => 'Collection', 
@@ -205,6 +195,14 @@ class Plants_Process_Ingest
                 preg_match('/\d{4}/', $resource['collection_date'], $yearMatches);
                 if (count($yearMatches)) {
                     $resource['collection_year'] = $yearMatches[0];
+                }
+            }
+            
+            // Extract the formal herbarium name.
+            if (isset($resource['herbarium'])) {
+                preg_match('/^(.+), .+$/', $resource['herbarium'], $herbariumMatches);
+                if (isset($herbariumMatches[1])) {
+                    $resource['herbarium_name'] = trim($herbariumMatches[1]);
                 }
             }
             

@@ -73,6 +73,7 @@ CREATE TABLE `resources` (
   `country` text COLLATE utf8_unicode_ci,
   `data_last_modified` text COLLATE utf8_unicode_ci,
   `herbarium` text COLLATE utf8_unicode_ci,
+  `herbarium_name` text COLLATE utf8_unicode_ci,
   `identifications` text COLLATE utf8_unicode_ci,
   `locality` text COLLATE utf8_unicode_ci,
   `notes` text COLLATE utf8_unicode_ci,
