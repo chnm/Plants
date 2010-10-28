@@ -5,7 +5,9 @@
 <style type="text/css">
   html { height: 100% }
   body { height: 100%; margin: 0px; padding: 0px }
-  #map_canvas { height: 100% }
+  #map-canvas { width:69%; height:100%; float:left; }
+  #tool-window { width:29%; float:left; }
+  #content-window { width:29%; float:left;}
 </style>
 
 <script type="text/javascript" src="http://code.jquery.com/jquery-1.4.3.min.js"></script>
@@ -18,16 +20,16 @@ var markers = [];
 function initialize() {
     
     // Set the map.
-    var latlng = new google.maps.LatLng(0, 0);
+    var latlng = new google.maps.LatLng(25, 0);
     var myOptions = {
         zoom: 2,
         center: latlng,
         mapTypeId: google.maps.MapTypeId.ROADMAP
     };
-    map = new google.maps.Map(document.getElementById("map"), myOptions);
+    map = new google.maps.Map(document.getElementById("map-canvas"), myOptions);
     
     // Get the KML and set the XML object.
-    $.post("http://localhost/Plants/kml.php", {searchId: 1}, function (data) {
+    $.post("http://localhost/Plants/kml.php", {searchId: <?php echo $_REQUEST['searchId']; ?>}, function (data) {
         kml = data;
         mapKml();
     });
@@ -80,56 +82,64 @@ function parseKml() {
     });
 }
 
-// Identical herbariums are named differently for every resource. May have to 
-// parse out formal name of herbarium during ingest.
-function getHerbariums() {
-    // http://www.hunlock.com/blogs/Mastering_Javascript_Arrays
-    var herbariums = [];
-    // http://api.jquery.com/category/selectors/
-    $(kml).find("Data[name='herbarium']").each(function () {
+function getSpecimens(name) {
+    
+    // Empty the content window.
+    $("#content-window").empty();
+    
+    // Get all values for the specified Data name.
+    var values = [];
+    $(kml).find("Data[name='" + name + "']").each(function () {
+        
         var value = $(this).children('value').text();
-        if ($.inArray(value, herbariums) == -1) {
-            herbariums.push(value);
+        
+        // Remove duplicate values
+        if ($.inArray(value, values) == -1 && value.length > 0) {
+            values.push(value);
         }
     });
-    alert(herbariums);
-}
-
-function getCollectionYears() {
-    var collectionYears = [];
-    $(kml).find("Data[name='collection_year']").each(function () {
-        var value = $(this).children('value').text();
-        if ($.inArray(value, collectionYears) == -1 && value.length > 0) {
-            collectionYears.push(value);
-        }
-    });
-    $.each(collectionYears.sort(), function (index, value) {
-        // Adding onclick to $("<a>") selector works in Firefox, but not in 
+    
+    // Append all values to the content window.
+    $.each(values.sort(), function (index, value) {
+        // Adding onclick to $("<a>") selector works in Firefox but not in 
         // Chrome. Must write out the entire tag.
-        $("#content-window").append($("<a href=\"#\" onclick=\"mapCollectionYears(" + value + ")\">" + value + "</a>"));
-        $("#content-window").append($("<br />"));
+        $("#content-window").append($("<a href=\"#\" onclick=\"mapSpecimens('" + name + "', this)\">" + value + "</a><br />"));
     });
 }
 
-function mapCollectionYears(value) {
+function mapSpecimens(name, element) {
+    
+    // Get the value from the passed element.
+    var value = $(element).text();
+    
+    // Delete all the markers.
     deleteMarkers();
-    $(kml).find("Placemark:has(Data[name='collection_year']):has(value):contains(" + value + ")").each(function () {
-        var coordinates = $(this).find("coordinates").text().split(",");
-        var point = new google.maps.LatLng(coordinates[1], coordinates[0]);
-        addMarker(point);
+    
+    // Could use ":has(value):contains('{value}')" to select only those 
+    // Placemarks with the specified value, but Escaping meta-characters in 
+    // selectors with \\ does not always work. See: http://stackoverflow.com/questions/739695/jquery-selector-value-escaping
+    $(kml).find("Placemark:has(Data[name='" + name + "'])").each(function () {
+        
+        // Only map specimens with the specified value.
+        if (value == $(this).find("Data[name='" + name + "']").children("value").text()) {
+            var coordinates = $(this).find("coordinates").text().split(",");
+            var point = new google.maps.LatLng(coordinates[1], coordinates[0]);
+            addMarker(point);
+        }
     });
 }
 </script>
 </head>
 <body onload="initialize()">
-    <div id="map" style="width:79%; height:100%; float:left"></div>
-    <div id="content-window" style="width:19%; height:100%; float:left">
+    <div id="map-canvas"></div>
+    <div id="tool-window">
         <button onclick="alert(kml);">Check for KML</button>
         <button onclick="parseKml();">Parse KML</button>
         <button onclick="mapKml();">Map KML</button>
-        <button onclick="getHerbariums();">Get Herbariums</button>
-        <button onclick="getCollectionYears();">Get Collection Years</button>
+        <button onclick="getSpecimens('herbarium');">Get Herbariums</button>
+        <button onclick="getSpecimens('collection_year');">Get Collection Years</button>
         <button onclick="deleteMarkers();">Delete Markers</button>
     </div>
+    <div id="content-window"></div>
     <div id='kml'></div>
 </body>
