@@ -121,6 +121,25 @@ class Plants_Process_Geolocate
                 
                 $this->_db->insert('geolocations', $geolocation);
             }
+            
+            // Record the highest ranking service with coordinates to the 
+            // resources_geolocations table.
+            $sql = 'SELECT g.id 
+                    FROM geolocations g 
+                    JOIN geolocation_services gs 
+                    ON g.geolocation_service_id = gs.id 
+                    WHERE g.resource_id = ? 
+                    AND g.latitude IS NOT NULL 
+                    AND g.longitude IS NOT NULL 
+                    ORDER BY gs.rank 
+                    LIMIT 1';
+            $geolocationId = $this->_db->fetchOne($sql, $resource['id']);
+            
+            if ($geolocationId) {
+                $this->_db->insert('resources_geolocations', 
+                                   array('resource_id' => $resource['id'], 
+                                         'geolocation_id' => $geolocationId));
+            }
         }
     }
 }

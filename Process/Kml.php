@@ -39,9 +39,6 @@ class Plants_Process_Kml extends XMLWriter
     /**
      * Writes KML during runtime.
      * 
-     * @todo This method of getting geolocations based on rank is sub-optimal. 
-     * Tried optimizing the SQL to one statement using IF, CASE, UNION, and 
-     * GROUP BY with no success. Continue exploring other ways.
      * @param int $searchId The search ID from which to generate the KML.
      * @param int $limit The maximum amount of results.
      * @param bool $xmlContentType Whether to include a text/xml content type
@@ -51,14 +48,17 @@ class Plants_Process_Kml extends XMLWriter
     {
         /* GET GEOLOCATION DATA */
         
-        // Fetch all resources for this search. Must limit total count to reduce 
-        // memory load, which is considerable on large datasets.
-        $sql = 'SELECT r.* 
-                FROM resources r
-                JOIN searches_resources sr 
-                ON r.id = sr.resource_id 
+        // Fetch all resources for this search that have coordinates.
+        $sql = 'SELECT r.*, g.latitude, g.longitude 
+                FROM searches_resources sr 
+                JOIN resources r 
+                ON sr.resource_id = r.id 
+                JOIN resources_geolocations rg 
+                ON r.id = rg.resource_id 
+                JOIN geolocations g 
+                ON rg.geolocation_id = g.id 
                 WHERE sr.search_id = ? 
-                LIMIT ? ';
+                LIMIT ?';
         $resources = $this->_db->fetchAll($sql, array($searchId, $limit));
         
         // Begin building the array containing valid geolocations for this search.
@@ -66,29 +66,6 @@ class Plants_Process_Kml extends XMLWriter
 
         // Iterate the resources.
         foreach ($resources as $resource) {
-            
-            // Iterate the geolocation services in rank order.
-            foreach ($this->_services as $serviceId) {
-                
-                // Fetch the geolocation for this resource/service.
-                $sql = 'SELECT * 
-                        FROM geolocations  
-                        WHERE resource_id = ? 
-                        AND geolocation_service_id = ? 
-                        AND latitude IS NOT NULL 
-                        AND longitude IS NOT NULL';
-                $geolocation = $this->_db->fetchRow($sql, array($resource['id'], $serviceId));
-                
-                // Stop iterating services is If the geolocation exists.
-                if ($geolocation) {
-                    break;
-                }
-            }
-            
-            // Continue to the next resource if no geolocation was found.
-            if (!$geolocation) {
-                continue;
-            }
             
             // Build the URL to JSTOR.
             $pattern = '/^.+\.([^.]+)\.([^.]+)$/e';
@@ -103,8 +80,8 @@ class Plants_Process_Kml extends XMLWriter
                                     'country'         => $resource['country'], 
                                     'collection_year' => $resource['collection_year'], 
                                     'collection_date' => $resource['collection_date'], 
-                                    'latitude'        => $geolocation['latitude'], 
-                                    'longitude'       => $geolocation['longitude'], 
+                                    'latitude'        => $resource['latitude'], 
+                                    'longitude'       => $resource['longitude'], 
                                     'url'             => $url);
         }
         

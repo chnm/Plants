@@ -3,7 +3,7 @@
 require 'config.php';
 
 // JSTOR Search URL.
-$searchUrl = 'http://plants.jstor.org/search?searchText=field&st=397153&st=6808&st=6836&t=397221';
+$searchUrl = 'http://plants.jstor.org/search?t=397153&searchText=sagebrush';
 
 // Ingest process.
 require_once 'Plants/Process/Ingest.php';

@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Oct 24, 2010 at 07:30 PM
+-- Generation Time: Oct 28, 2010 at 12:05 AM
 -- Server version: 5.1.41
 -- PHP Version: 5.3.2-1ubuntu4.5
 
@@ -83,6 +83,20 @@ CREATE TABLE `resources` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `doi` (`doi`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `resources_geolocations`
+--
+
+CREATE TABLE `resources_geolocations` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `resource_id` int(10) unsigned NOT NULL,
+  `geolocation_id` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `resource_id` (`resource_id`,`geolocation_id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
