@@ -100,17 +100,21 @@ function getSpecimens(name) {
     });
     
     // Append all values to the content window.
+    
+    var select = "<select onchange=\"mapSpecimens('" + name + "', this)\"><option>Choose one...</option>";
     $.each(values.sort(), function (index, value) {
         // Adding onclick to $("<a>") selector works in Firefox but not in 
         // Chrome. Must write out the entire tag.
-        $("#content-window").append($("<a href=\"#\" onclick=\"mapSpecimens('" + name + "', this)\">" + value + "</a><br />"));
+        select += "<option>" + value + "</option>";
     });
+    select += "</select>";
+    $("#content-window").append(select);
 }
 
 function mapSpecimens(name, element) {
     
-    // Get the value from the passed element.
-    var value = $(element).text();
+    // Get the value from the passed element. element is HTMLSelectElement.
+    var value = element.value;
     
     // Delete all the markers.
     deleteMarkers();
@@ -138,6 +142,8 @@ function mapSpecimens(name, element) {
         <button onclick="mapKml();">Map KML</button>
         <button onclick="getSpecimens('herbarium');">Get Herbariums</button>
         <button onclick="getSpecimens('collection_year');">Get Collection Years</button>
+        <button onclick="getSpecimens('country');">Get Countries</button>
+        <button onclick="getSpecimens('collector');">Get Collectors</button>
         <button onclick="deleteMarkers();">Delete Markers</button>
     </div>
     <div id="content-window"></div>

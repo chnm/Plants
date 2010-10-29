@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Oct 28, 2010 at 12:05 AM
+-- Generation Time: Oct 29, 2010 at 11:48 AM
 -- Server version: 5.1.41
 -- PHP Version: 5.3.2-1ubuntu4.5
 
@@ -70,7 +70,9 @@ CREATE TABLE `resources` (
   `collection_altitude` text COLLATE utf8_unicode_ci,
   `collection_date` text COLLATE utf8_unicode_ci,
   `collector` text COLLATE utf8_unicode_ci,
+  `collector_name` text COLLATE utf8_unicode_ci,
   `country` text COLLATE utf8_unicode_ci,
+  `country_name` text COLLATE utf8_unicode_ci,
   `data_last_modified` text COLLATE utf8_unicode_ci,
   `herbarium` text COLLATE utf8_unicode_ci,
   `herbarium_name` text COLLATE utf8_unicode_ci,
@@ -97,7 +99,7 @@ CREATE TABLE `resources_geolocations` (
   `geolocation_id` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `resource_id` (`resource_id`,`geolocation_id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 

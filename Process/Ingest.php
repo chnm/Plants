@@ -200,9 +200,31 @@ class Plants_Process_Ingest
             
             // Extract the formal herbarium name.
             if (isset($resource['herbarium'])) {
-                preg_match('/^(.+), .+$/', $resource['herbarium'], $herbariumMatches);
+                preg_match('/(.+), .+$/', $resource['herbarium'], $herbariumMatches);
                 if (isset($herbariumMatches[1])) {
                     $resource['herbarium_name'] = trim($herbariumMatches[1]);
+                } else {
+                    $resource['herbarium_name'] = $resource['herbarium'];
+                }
+            }
+            
+            // Extract the formal country name.
+            if (isset($resource['country'])) {
+                preg_match('/^(.+) \(.+\)$/', $resource['country'], $countryMatches);
+                if (isset($countryMatches[1])) {
+                    $resource['country_name'] = trim($countryMatches[1]);
+                } else {
+                    $resource['country_name'] = $resource['country'];
+                }
+            }
+            
+            // Extract the formal collector name.
+            if (isset($resource['collector'])) {
+                preg_match('/(.+), .+$/', $resource['collector'], $collectorMatches);
+                if (isset($collectorMatches[1])) {
+                    $resource['collector_name'] = trim($collectorMatches[1]);
+                } else {
+                    $resource['collector_name'] = $resource['collector'];
                 }
             }
             
