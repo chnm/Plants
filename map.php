@@ -79,6 +79,7 @@ function addMarker(placemark) {
     
     // Set the info window click event to the marker.
     new google.maps.event.addListener(marker, 'click', function() {
+        closeInfoWindows();
         infoWindows[markersLength - 1].open(map, marker);
     });
 }
@@ -93,8 +94,18 @@ function deleteMarkers() {
         for (i in markers) {
             markers[i].setMap(null);
         }
-        markers.length = 0;
-        infoWindows.length = 0;
+        closeInfoWindows();
+        markers = [];
+        infoWindows = [];
+    }
+}
+
+function closeInfoWindows()
+{
+    if (infoWindows) {
+        for (i in infoWindows) {
+            infoWindows[i].close();
+        }
     }
 }
 
