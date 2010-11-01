@@ -15,8 +15,7 @@ class Plants_Process_Kml extends XMLWriter
                                    'herbarium'       => 'Herbarium', 
                                    'collector'       => 'Collector', 
                                    'collection_year' => 'Collection Year', 
-                                   'collection_date' => 'Collection Date', 
-                                   'url'             => 'URL');
+                                   'collection_date' => 'Collection Date');
 
     
     /**

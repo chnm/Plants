@@ -8,6 +8,9 @@
   #map-canvas { width:69%; height:100%; float:left; }
   #tool-window { width:29%; float:left; }
   #content-window { width:29%; float:left;}
+  .info-window h1 { font-size: 14px; }
+  .info-window p { font-size: 12px; }
+  .info-window table, td { font-size: 12px; border: 1px solid gray; }
 </style>
 
 <script type="text/javascript" src="http://code.jquery.com/jquery-1.4.3.min.js"></script>
@@ -16,6 +19,7 @@
 var kml;
 var map;
 var markers = [];
+var infoWindows = [];
 
 function initialize() {
     
@@ -38,10 +42,12 @@ function initialize() {
 /**
  * Adds a marker to the map.
  * 
- * @link http://api.jquery.com/category/traversing/tree-traversal/
+ * @link http://code.google.com/apis/maps/documentation/javascript/overlays.html
  * @param Element KML Placemark element.
  */
 function addMarker(placemark) {
+    
+    // Map the marker.
     var name = $(placemark).children("name").text();
     var description = $(placemark).children("description").text();
     var coordinates = $(placemark).find("coordinates").text().split(",");
@@ -50,7 +56,31 @@ function addMarker(placemark) {
         position: new google.maps.LatLng(coordinates[1], coordinates[0]), 
         title: name
     });
-    markers.push(marker);
+    
+    // Build info window content string.
+    var contentString = '<div class="info-window">'
+                      + '<h1>' + name + '</h1>'
+                      + '<p><a href="' + description + '" target="_blank">View Specimen on JSTOR</a></p>'
+                      + '<table>';
+    $(placemark).find("Data").each(function (){
+        var displayName = $(this).children("displayName").text();
+        var value = $(this).children("value").text();
+        contentString += '<tr><td>' + displayName + '</td><td>' + value + '</td></tr>';
+    });
+    contentString += '</table></div>';
+    var infoWindow = new google.maps.InfoWindow({
+        content: contentString, 
+        maxWidth: 400
+    });
+    
+    // Push the marker and info window to their respective arrays.
+    var markersLength = markers.push(marker);
+    infoWindows.push(infoWindow);
+    
+    // Set the info window click event to the marker.
+    new google.maps.event.addListener(marker, 'click', function() {
+        infoWindows[markersLength - 1].open(map, marker);
+    });
 }
 
 /**
@@ -64,6 +94,7 @@ function deleteMarkers() {
             markers[i].setMap(null);
         }
         markers.length = 0;
+        infoWindows.length = 0;
     }
 }
 
@@ -81,6 +112,8 @@ function mapKml() {
 
 /**
  * Unused proof of concept function that renders all KML Placemark data.
+ * 
+ * @link http://api.jquery.com/category/traversing/tree-traversal/
  */
 function parseKml() {
     $(kml).find("Placemark").each(function () {
