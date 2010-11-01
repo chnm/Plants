@@ -28,22 +28,36 @@ function initialize() {
     };
     map = new google.maps.Map(document.getElementById("map-canvas"), myOptions);
     
-    // Get the KML and set the XML object.
+    // Get the KML, set the XML object, and map all Placemarks.
     $.post("http://localhost/Plants/kml.php", {searchId: <?php echo $_REQUEST['searchId']; ?>}, function (data) {
         kml = data;
         mapKml();
     });
 }
 
-// http://code.google.com/apis/maps/documentation/javascript/overlays.html#RemovingOverlays
-function addMarker(point) {
-    marker = new google.maps.Marker({
-        position: point,
-        map: map
+/**
+ * Adds a marker to the map.
+ * 
+ * @link http://api.jquery.com/category/traversing/tree-traversal/
+ * @param Element KML Placemark element.
+ */
+function addMarker(placemark) {
+    var name = $(placemark).children("name").text();
+    var description = $(placemark).children("description").text();
+    var coordinates = $(placemark).find("coordinates").text().split(",");
+    var marker = new google.maps.Marker({
+        map: map, 
+        position: new google.maps.LatLng(coordinates[1], coordinates[0]), 
+        title: name
     });
     markers.push(marker);
 }
-// Deletes all markers in the array by removing references to them
+
+/**
+ * Deletes all markers from the map by removing references to them.
+ * 
+ * @link http://code.google.com/apis/maps/documentation/javascript/overlays.html#RemovingOverlays
+ */
 function deleteMarkers() {
     if (markers) {
         for (i in markers) {
@@ -53,19 +67,21 @@ function deleteMarkers() {
     }
 }
 
-// http://articles.sitepoint.com/article/google-maps-api-jquery
+/**
+ * Map all KML Placemarks on the map.
+ * 
+ * @link http://articles.sitepoint.com/article/google-maps-api-jquery
+ */
 function mapKml() {
     deleteMarkers();
     $(kml).find("Placemark").each(function () {
-        var name = $(this).children("name").text();
-        var description = $(this).children("description").text();
-        var coordinates = $(this).find("coordinates").text().split(",");
-        var point = new google.maps.LatLng(coordinates[1], coordinates[0]);
-        addMarker(point);
+        addMarker(this);
     });
 }
 
-// http://api.jquery.com/category/traversing/tree-traversal/
+/**
+ * Unused proof of concept function that renders all KML Placemark data.
+ */
 function parseKml() {
     $(kml).find("Placemark").each(function () {
         var name = $(this).children("name").text();
@@ -82,6 +98,11 @@ function parseKml() {
     });
 }
 
+/**
+ * Get distinct values for the specified KML Data name.
+ * 
+ * @param string The KML Data name to search.
+ */
 function getSpecimens(name) {
     
     // Empty the content window.
@@ -103,32 +124,31 @@ function getSpecimens(name) {
     
     var select = "<select onchange=\"mapSpecimens('" + name + "', this)\"><option>Choose one...</option>";
     $.each(values.sort(), function (index, value) {
-        // Adding onclick to $("<a>") selector works in Firefox but not in 
-        // Chrome. Must write out the entire tag.
         select += "<option>" + value + "</option>";
     });
     select += "</select>";
     $("#content-window").append(select);
 }
 
+/**
+ * Place a marker on the map for every specimen that matches the search.
+ * 
+ * @param string The KML Data name to search.
+ * @param HTMLSelectElement The HTTP select element containing the search string.
+ */
 function mapSpecimens(name, element) {
-    
-    // Get the value from the passed element. element is HTMLSelectElement.
-    var value = element.value;
-    
-    // Delete all the markers.
     deleteMarkers();
+    var value = element.value;
     
     // Could use ":has(value):contains('{value}')" to select only those 
     // Placemarks with the specified value, but Escaping meta-characters in 
-    // selectors with \\ does not always work. See: http://stackoverflow.com/questions/739695/jquery-selector-value-escaping
+    // selectors with \\ does not always work.
+    // See: http://stackoverflow.com/questions/739695/jquery-selector-value-escaping
     $(kml).find("Placemark:has(Data[name='" + name + "'])").each(function () {
         
         // Only map specimens with the specified value.
         if (value == $(this).find("Data[name='" + name + "']").children("value").text()) {
-            var coordinates = $(this).find("coordinates").text().split(",");
-            var point = new google.maps.LatLng(coordinates[1], coordinates[0]);
-            addMarker(point);
+            addMarker(this);
         }
     });
 }
