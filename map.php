@@ -228,33 +228,33 @@ function mapSpecimens(name, element) {
 /**
  * Color code the specimen markers according to herbarium.
  */
-function colorCodeHerbariums() {
-    $("#cc-herbariums").empty();
-    var ccHerbariums = [];
+function colorCodeIcons(name) {
+    $("#cc-icons").empty();
+    var values = [];
     
     // Iterate the markers.
     for (i in markers) {
         
         // Get the herbarium.
-        var ccHerbarium = $(infoWindows[i].getContent()).find("Data[name='herbarium']").children("value").text();
+        var value = $(infoWindows[i].getContent()).find("Data[name='" + name + "']").children("value").text();
         
         // Build an array of unique herbariums.
-        var ccHerbariumKey = $.inArray(ccHerbarium, ccHerbariums);
-        if (ccHerbariumKey == -1) {
-            ccHerbariumKey = ccHerbariums.push(ccHerbarium) - 1;
+        var key = $.inArray(value, values);
+        if (key == -1) {
+            key = values.push(value) - 1;
         }
         
         // Set the marker to its herbarium's corresponding color coded icon.
-        markers[i].setIcon("icons/" + ccIcons[ccHerbariumKey]);
+        markers[i].setIcon("icons/" + ccIcons[key]);
     }
     
     // Display the herbarium color table.
-    var ccHerbariumTable = '<table>';
-    for (i in ccHerbariums) {
-        ccHerbariumTable += '<tr><td><img src="icons/' + ccIcons[i] + '" /></td><td>' + ccHerbariums[i] + '</td></tr>';
+    var table = '<table>';
+    for (i in values) {
+        table += '<tr><td><img src="icons/' + ccIcons[i] + '" /></td><td>' + values[i] + '</td></tr>';
     }
-    ccHerbariumTable += '</table>';
-    $("#cc-herbariums").append(ccHerbariumTable);
+    table += '</table>';
+    $("#cc-icons").append(table);
 }
 </script>
 </head>
@@ -264,7 +264,9 @@ function colorCodeHerbariums() {
         <button onclick="alert(kml);">Check for KML</button>
         <button onclick="parseKml();">Parse KML</button>
         <button onclick="mapKml();">Map KML</button>
-        <button onclick="colorCodeHerbariums();">Color Code Herbariums</button>
+        <button onclick="colorCodeIcons('herbarium');">Color Code Herbariums</button>
+        <button onclick="colorCodeIcons('collection_year');">Color Code Collection Years</button>
+        <button onclick="colorCodeIcons('country');">Color Code Countries</button>
         <button onclick="getSpecimens('herbarium');">Get Herbariums</button>
         <button onclick="getSpecimens('collection_year');">Get Collection Years</button>
         <button onclick="getSpecimens('country');">Get Countries</button>
@@ -272,6 +274,6 @@ function colorCodeHerbariums() {
         <button onclick="deleteMarkers();">Delete Markers</button>
     </div>
     <div id="content-window"></div>
-    <div id="cc-herbariums"></div>
+    <div id="cc-icons"></div>
     <div id='kml'></div>
 </body>
