@@ -20,8 +20,28 @@ var kml;
 var map;
 var markers = [];
 var infoWindows = [];
-var iconColors = ["blue", "brown", "darkgreen", "green", "orange", "paleblue", 
-                  "pink", "purple", "red", "yellow"]
+var ccIcons = [
+    "blue_MarkerA.png", "brown_MarkerA.png", "darkgreen_MarkerA.png", 
+    "green_MarkerA.png", "orange_MarkerA.png", "paleblue_MarkerA.png", 
+    "pink_MarkerA.png", "purple_MarkerA.png", "red_MarkerA.png", 
+    "yellow_MarkerA.png", 
+    "blue_MarkerB.png", "brown_MarkerB.png", "darkgreen_MarkerB.png", 
+    "green_MarkerB.png", "orange_MarkerB.png", "paleblue_MarkerB.png", 
+    "pink_MarkerB.png", "purple_MarkerB.png", "red_MarkerB.png", 
+    "yellow_MarkerB.png", 
+    "blue_MarkerC.png", "brown_MarkerC.png", "darkgreen_MarkerC.png", 
+    "green_MarkerC.png", "orange_MarkerC.png", "paleblue_MarkerC.png", 
+    "pink_MarkerC.png", "purple_MarkerC.png", "red_MarkerC.png", 
+    "yellow_MarkerC.png", 
+    "blue_MarkerD.png", "brown_MarkerD.png", "darkgreen_MarkerD.png", 
+    "green_MarkerD.png", "orange_MarkerD.png", "paleblue_MarkerD.png", 
+    "pink_MarkerD.png", "purple_MarkerD.png", "red_MarkerD.png", 
+    "yellow_MarkerD.png", 
+    "blue_MarkerE.png", "brown_MarkerE.png", "darkgreen_MarkerE.png", 
+    "green_MarkerE.png", "orange_MarkerE.png", "paleblue_MarkerE.png", 
+    "pink_MarkerE.png", "purple_MarkerE.png", "red_MarkerE.png", 
+    "yellow_MarkerE.png"
+]
 
 function initialize() {
     
@@ -69,26 +89,16 @@ function addMarker(placemark) {
          }
     }
     
+    
+    
     var marker = new google.maps.Marker({
         map: map, 
         position: new google.maps.LatLng(coordinatesArray[1], coordinatesArray[0]), 
         title: name
     });
     
-    // Build info window content string.
-    var contentString = '<div class="info-window">'
-                      + '<h1>' + name + '</h1>'
-                      + '<p><a href="' + description + '" target="_blank">View Specimen on JSTOR</a></p>'
-                      + '<table>';
-    $(placemark).find("Data").each(function (){
-        var displayName = $(this).children("displayName").text();
-        var value = $(this).children("value").text();
-        contentString += '<tr><td>' + displayName + '</td><td>' + value + '</td></tr>';
-    });
-    contentString += '<tr><td>Coordinates</td><td>' + coordinates + '</td></tr>'
-                   + '</table></div>';
     var infoWindow = new google.maps.InfoWindow({
-        content: contentString, 
+        content: placemark, 
         maxWidth: 400
     });
     
@@ -98,7 +108,20 @@ function addMarker(placemark) {
     
     // Set the info window click event to the marker.
     new google.maps.event.addListener(marker, 'click', function() {
+        // Build info window content string.
+        var contentString = '<div class="info-window">'
+                          + '<h1>' + name + '</h1>'
+                          + '<p><a href="' + description + '" target="_blank">View Specimen on JSTOR</a></p>'
+                          + '<table>';
+        $(placemark).find("Data").each(function (){
+            var displayName = $(this).children("displayName").text();
+            var value = $(this).children("value").text();
+            contentString += '<tr><td>' + displayName + '</td><td>' + value + '</td></tr>';
+        });
+        contentString += '<tr><td>Coordinates</td><td>' + coordinates + '</td></tr>'
+                       + '</table></div>';
         closeInfoWindows();
+        infoWindows[markersLength - 1].setContent(contentString);
         infoWindows[markersLength - 1].open(map, marker);
     });
 }
@@ -214,6 +237,29 @@ function mapSpecimens(name, element) {
         }
     });
 }
+
+/**
+ * Color code the specimen markers according to herbarium.
+ */
+function colorCodeHerbariums() {
+    var ccHerbariums = [];
+    
+    // Iterate the markers.
+    for (i in markers) {
+        
+        // Get the herbarium.
+        var ccHerbarium = $(infoWindows[i].getContent()).find("Data[name='herbarium']").children("value").text();
+        
+        // Build an array of unique herbariums.
+        var ccHerbariumKey = $.inArray(ccHerbarium, ccHerbariums);
+        if (ccHerbariumKey == -1) {
+            ccHerbariumKey = ccHerbariums.push(ccHerbarium) - 1;
+        }
+        
+        // Set the marker to its herbarium's corresponding color coded icon.
+        markers[i].setIcon("icons/" + ccIcons[ccHerbariumKey]);
+    }
+}
 </script>
 </head>
 <body onload="initialize()">
@@ -222,6 +268,7 @@ function mapSpecimens(name, element) {
         <button onclick="alert(kml);">Check for KML</button>
         <button onclick="parseKml();">Parse KML</button>
         <button onclick="mapKml();">Map KML</button>
+        <button onclick="colorCodeHerbariums();">Color Code Herbariums</button>
         <button onclick="getSpecimens('herbarium');">Get Herbariums</button>
         <button onclick="getSpecimens('collection_year');">Get Collection Years</button>
         <button onclick="getSpecimens('country');">Get Countries</button>
