@@ -62,10 +62,10 @@ function addMarker(placemark) {
         var existingLongitude = markers[i].getPosition().lng();
         if (coordinatesArray[1] == existingLatitude 
          && coordinatesArray[0] == existingLongitude) {
-             // Generate random numbers between -0.0001 and 0.0001.
+             // Generate random numbers between −0.001 and 0.001.
              // See: http://www.kadimi.com/en/negative-random-87
-             coordinatesArray[1] = existingLatitude + (((Math.random() * 2) + -1)/1000);
-             coordinatesArray[0] = existingLongitude + ((Math.random() * 2) + -1)/1000;
+             coordinatesArray[1] = existingLatitude + ((Math.random() * 2) + -1)/100;
+             coordinatesArray[0] = existingLongitude + ((Math.random() * 2) + -1)/100;
          }
     }
     
