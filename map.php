@@ -50,10 +50,26 @@ function addMarker(placemark) {
     // Map the marker.
     var name = $(placemark).children("name").text();
     var description = $(placemark).children("description").text();
-    var coordinates = $(placemark).find("coordinates").text().split(",");
+    var coordinates = $(placemark).find("coordinates").text();
+    var coordinatesArray = coordinates.split(",");
+    
+    // Scatter specimens with identical coordinates by randomizing their 
+    // latitudes and longitudes.
+    for (i in markers) {
+        var existingLatitude = markers[i].getPosition().lat();
+        var existingLongitude = markers[i].getPosition().lng();
+        if (coordinatesArray[1] == existingLatitude 
+         && coordinatesArray[0] == existingLongitude) {
+             // Generate random numbers between -0.0001 and 0.0001.
+             // See: http://www.kadimi.com/en/negative-random-87
+             coordinatesArray[1] = existingLatitude + (((Math.random() * 3) + -1)/1000);
+             coordinatesArray[0] = existingLongitude + ((Math.random() * 3) + -1)/1000;
+         }
+    }
+    
     var marker = new google.maps.Marker({
         map: map, 
-        position: new google.maps.LatLng(coordinates[1], coordinates[0]), 
+        position: new google.maps.LatLng(coordinatesArray[1], coordinatesArray[0]), 
         title: name
     });
     
@@ -67,7 +83,8 @@ function addMarker(placemark) {
         var value = $(this).children("value").text();
         contentString += '<tr><td>' + displayName + '</td><td>' + value + '</td></tr>';
     });
-    contentString += '</table></div>';
+    contentString += '<tr><td>Coordinates</td><td>' + coordinates + '</td></tr>'
+                   + '</table></div>';
     var infoWindow = new google.maps.InfoWindow({
         content: contentString, 
         maxWidth: 400
@@ -90,22 +107,21 @@ function addMarker(placemark) {
  * @link http://code.google.com/apis/maps/documentation/javascript/overlays.html#RemovingOverlays
  */
 function deleteMarkers() {
-    if (markers) {
-        for (i in markers) {
-            markers[i].setMap(null);
-        }
-        closeInfoWindows();
-        markers = [];
-        infoWindows = [];
+    for (i in markers) {
+        markers[i].setMap(null);
     }
+    closeInfoWindows();
+    markers = [];
+    infoWindows = [];
 }
 
+/**
+ * Closes all open info windows.
+ */
 function closeInfoWindows()
 {
-    if (infoWindows) {
-        for (i in infoWindows) {
-            infoWindows[i].close();
-        }
+    for (i in infoWindows) {
+        infoWindows[i].close();
     }
 }
 
