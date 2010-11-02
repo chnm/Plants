@@ -242,6 +242,7 @@ function mapSpecimens(name, element) {
  * Color code the specimen markers according to herbarium.
  */
 function colorCodeHerbariums() {
+    $("#cc-herbariums").empty();
     var ccHerbariums = [];
     
     // Iterate the markers.
@@ -259,6 +260,14 @@ function colorCodeHerbariums() {
         // Set the marker to its herbarium's corresponding color coded icon.
         markers[i].setIcon("icons/" + ccIcons[ccHerbariumKey]);
     }
+    
+    // Display the herbarium color table.
+    var ccHerbariumTable = '<table>';
+    for (i in ccHerbariums) {
+        ccHerbariumTable += '<tr><td><img src="icons/' + ccIcons[i] + '" /></td><td>' + ccHerbariums[i] + '</td></tr>';
+    }
+    ccHerbariumTable += '</table>';
+    $("#cc-herbariums").append(ccHerbariumTable);
 }
 </script>
 </head>
@@ -276,5 +285,6 @@ function colorCodeHerbariums() {
         <button onclick="deleteMarkers();">Delete Markers</button>
     </div>
     <div id="content-window"></div>
+    <div id="cc-herbariums"></div>
     <div id='kml'></div>
 </body>
