@@ -20,28 +20,7 @@ var kml;
 var map;
 var markers = [];
 var infoWindows = [];
-var ccIcons = [
-    "blue_MarkerA.png", "brown_MarkerA.png", "darkgreen_MarkerA.png", 
-    "green_MarkerA.png", "orange_MarkerA.png", "paleblue_MarkerA.png", 
-    "pink_MarkerA.png", "purple_MarkerA.png", "red_MarkerA.png", 
-    "yellow_MarkerA.png", 
-    "blue_MarkerB.png", "brown_MarkerB.png", "darkgreen_MarkerB.png", 
-    "green_MarkerB.png", "orange_MarkerB.png", "paleblue_MarkerB.png", 
-    "pink_MarkerB.png", "purple_MarkerB.png", "red_MarkerB.png", 
-    "yellow_MarkerB.png", 
-    "blue_MarkerC.png", "brown_MarkerC.png", "darkgreen_MarkerC.png", 
-    "green_MarkerC.png", "orange_MarkerC.png", "paleblue_MarkerC.png", 
-    "pink_MarkerC.png", "purple_MarkerC.png", "red_MarkerC.png", 
-    "yellow_MarkerC.png", 
-    "blue_MarkerD.png", "brown_MarkerD.png", "darkgreen_MarkerD.png", 
-    "green_MarkerD.png", "orange_MarkerD.png", "paleblue_MarkerD.png", 
-    "pink_MarkerD.png", "purple_MarkerD.png", "red_MarkerD.png", 
-    "yellow_MarkerD.png", 
-    "blue_MarkerE.png", "brown_MarkerE.png", "darkgreen_MarkerE.png", 
-    "green_MarkerE.png", "orange_MarkerE.png", "paleblue_MarkerE.png", 
-    "pink_MarkerE.png", "purple_MarkerE.png", "red_MarkerE.png", 
-    "yellow_MarkerE.png"
-]
+var ccIcons = [];
 
 function initialize() {
     
@@ -53,6 +32,16 @@ function initialize() {
         mapTypeId: google.maps.MapTypeId.ROADMAP
     };
     map = new google.maps.Map(document.getElementById("map-canvas"), myOptions);
+    
+    // Set the color code icon image array.
+    var iconColors = ["blue", "brown", "darkgreen", "green", "orange", 
+                      "paleblue", "pink", "purple", "red", "yellow"];
+    var iconAlpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    for (i = 0; i < iconAlpha.length; i++) {
+        for (j in iconColors) {
+            ccIcons.push(iconColors[j] + "_Marker" + iconAlpha.charAt(i) + ".png");
+        }
+    }
     
     // Get the KML, set the XML object, and map all Placemarks.
     $.post("http://localhost/Plants/kml.php", {searchId: <?php echo $_REQUEST['searchId']; ?>}, function (data) {
@@ -88,8 +77,6 @@ function addMarker(placemark) {
              coordinatesArray[0] = existingLongitude + ((Math.random() * 2) + -1)/100;
          }
     }
-    
-    
     
     var marker = new google.maps.Marker({
         map: map, 
