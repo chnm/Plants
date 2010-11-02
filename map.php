@@ -20,6 +20,8 @@ var kml;
 var map;
 var markers = [];
 var infoWindows = [];
+var iconColors = ["blue", "brown", "darkgreen", "green", "orange", "paleblue", 
+                  "pink", "purple", "red", "yellow"]
 
 function initialize() {
     
@@ -62,8 +64,8 @@ function addMarker(placemark) {
          && coordinatesArray[0] == existingLongitude) {
              // Generate random numbers between -0.0001 and 0.0001.
              // See: http://www.kadimi.com/en/negative-random-87
-             coordinatesArray[1] = existingLatitude + (((Math.random() * 3) + -1)/1000);
-             coordinatesArray[0] = existingLongitude + ((Math.random() * 3) + -1)/1000;
+             coordinatesArray[1] = existingLatitude + (((Math.random() * 2) + -1)/1000);
+             coordinatesArray[0] = existingLongitude + ((Math.random() * 2) + -1)/1000;
          }
     }
     
