@@ -22,7 +22,7 @@ var markers = [];
 var infoWindows = [];
 var ccIcons = [];
 
-function initialize() {
+$(document).ready(function() {
     
     // Set the map.
     var latlng = new google.maps.LatLng(25, 0);
@@ -48,7 +48,30 @@ function initialize() {
         kml = data;
         mapKml();
     });
-}
+    
+    // Event listeners.
+    $("#button-cc-herbarium").click(function() {
+        colorCodeIcons('herbarium');
+    });
+    $("#button-cc-country").click(function() {
+        colorCodeIcons('country');
+    });
+    $("#button-cc-collector").click(function() {
+        colorCodeIcons('collector');
+    });
+    $("#button-get-herbarium").click(function() {
+        getSpecimens('herbarium');
+    });
+    $("#button-get-collection-year").click(function() {
+        getSpecimens('collection_year');
+    });
+    $("#button-get-country").click(function() {
+        getSpecimens('country');
+    });
+    $("#button-get-collector").click(function() {
+        getSpecimens('collector');
+    });
+});
 
 /**
  * Adds a marker to the map.
@@ -264,23 +287,19 @@ function colorCodeIcons(name) {
 }
 </script>
 </head>
-<body onload="initialize()">
+<body>
     <div id="map-canvas"></div>
     <div id="tool-window">
-        <button onclick="alert(kml);">Check for KML</button>
-        <button onclick="parseKml();">Parse KML</button>
-        <button onclick="mapKml();">Map KML</button>
-        <button onclick="colorCodeIcons('herbarium');">Color Code Herbariums</button>
-        <button onclick="colorCodeIcons('collection_year');">Color Code Collection Years</button>
-        <button onclick="colorCodeIcons('country');">Color Code Countries</button>
-        <button onclick="colorCodeIcons('collector');">Color Code Collectors</button>
-        <button onclick="getSpecimens('herbarium');">Get Herbariums</button>
-        <button onclick="getSpecimens('collection_year');">Get Collection Years</button>
-        <button onclick="getSpecimens('country');">Get Countries</button>
-        <button onclick="getSpecimens('collector');">Get Collectors</button>
-        <button onclick="deleteMarkers();">Delete Markers</button>
+        <button id="button-cc-herbarium">Color Code Herbariums</button>
+        <button id="button-cc-country">Color Code Countries</button>
+        <button id="button-cc-collector">Color Code Collectors</button>
+        <button id="button-get-herbarium">Get Herbariums</button>
+        <button id="button-get-collection-year">Get Collection Years</button>
+        <button id="button-get-country">Get Countries</button>
+        <button id="button-get-collector">Get Collectors</button>
     </div>
     <div id="content-window"></div>
     <div id="cc-icons"></div>
+    <div id='slider'></div>
     <div id='kml'></div>
 </body>
