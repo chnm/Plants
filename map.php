@@ -245,13 +245,19 @@ function colorCodeIcons(name) {
         }
         
         // Set the marker to its herbarium's corresponding color coded icon.
-        markers[i].setIcon("icons/" + ccIcons[key]);
+        // Note that there are only 240 markers, so any unique values beyond 
+        // that will not be color coded.
+        if (ccIcons[key] !== undefined) {
+            markers[i].setIcon("icons/" + ccIcons[key]);
+        }
     }
     
     // Display the herbarium color table.
     var table = '<table>';
     for (i in values) {
-        table += '<tr><td><img src="icons/' + ccIcons[i] + '" /></td><td>' + values[i] + '</td></tr>';
+        if (ccIcons[i] !== undefined) {
+            table += '<tr><td><img src="icons/' + ccIcons[i] + '" /></td><td>' + values[i] + '</td></tr>';
+        }
     }
     table += '</table>';
     $("#cc-icons").append(table);
@@ -267,6 +273,7 @@ function colorCodeIcons(name) {
         <button onclick="colorCodeIcons('herbarium');">Color Code Herbariums</button>
         <button onclick="colorCodeIcons('collection_year');">Color Code Collection Years</button>
         <button onclick="colorCodeIcons('country');">Color Code Countries</button>
+        <button onclick="colorCodeIcons('collector');">Color Code Collectors</button>
         <button onclick="getSpecimens('herbarium');">Get Herbariums</button>
         <button onclick="getSpecimens('collection_year');">Get Collection Years</button>
         <button onclick="getSpecimens('country');">Get Countries</button>
