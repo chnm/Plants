@@ -5,12 +5,13 @@
 <style type="text/css">
   html { height: 100% }
   body { height: 100%; margin: 0px; padding: 0px }
-  #map-canvas { width:69%; height:100%; float:left; }
-  #tool-window { width:29%; float:left; }
-  #content-window { width:29%; float:left;}
+  #map-canvas { width:69%; height:70%; float: left; }
+  #cc-key-window { width:29%; float: right; }
+  #tool-window { width:69%; clear: left;}
+  #content-window { width:100%;}
   .info-window h1 { font-size: 14px; }
   .info-window p { font-size: 12px; }
-  .info-window table, td { font-size: 12px; border: 1px solid gray; }
+  .info-window table, .info-window td { font-size: 12px; border: 1px solid gray; }
 </style>
 
 <script type="text/javascript" src="http://code.jquery.com/jquery-1.4.3.min.js"></script>
@@ -59,16 +60,16 @@ $(document).ready(function() {
     $("#button-cc-collector").click(function() {
         colorCodeIcons('collector');
     });
-    $("#button-get-herbarium").click(function() {
+    $("#button-map-herbarium").click(function() {
         getSpecimens('herbarium');
     });
-    $("#button-get-collection-year").click(function() {
+    $("#button-map-collection-year").click(function() {
         getSpecimens('collection_year');
     });
-    $("#button-get-country").click(function() {
+    $("#button-map-country").click(function() {
         getSpecimens('country');
     });
-    $("#button-get-collector").click(function() {
+    $("#button-map-collector").click(function() {
         getSpecimens('collector');
     });
 });
@@ -232,6 +233,7 @@ function getSpecimens(name) {
  * @param HTMLSelectElement The HTTP select element containing the search string.
  */
 function mapSpecimens(name, element) {
+    $("#cc-key-window").empty();
     deleteMarkers();
     var value = element.value;
     
@@ -252,7 +254,7 @@ function mapSpecimens(name, element) {
  * Color code the specimen markers according to herbarium.
  */
 function colorCodeIcons(name) {
-    $("#cc-icons").empty();
+    $("#cc-key-window").empty();
     var values = [];
     
     // Iterate the markers.
@@ -283,23 +285,17 @@ function colorCodeIcons(name) {
         }
     }
     table += '</table>';
-    $("#cc-icons").append(table);
+    $("#cc-key-window").append(table);
 }
 </script>
 </head>
 <body>
     <div id="map-canvas"></div>
+    <div id="cc-key-window"></div>
     <div id="tool-window">
-        <button id="button-cc-herbarium">Color Code Herbariums</button>
-        <button id="button-cc-country">Color Code Countries</button>
-        <button id="button-cc-collector">Color Code Collectors</button>
-        <button id="button-get-herbarium">Get Herbariums</button>
-        <button id="button-get-collection-year">Get Collection Years</button>
-        <button id="button-get-country">Get Countries</button>
-        <button id="button-get-collector">Get Collectors</button>
+        color code: <button id="button-cc-herbarium">herbariums</button><button id="button-cc-country">countries</button><button id="button-cc-collector">collectors</button>
+        map: <button id="button-map-herbarium">herbariums</button><button id="button-map-collection-year">collection years</button><button id="button-map-country">countries</button><button id="button-map-collector">collectors</button>
     </div>
     <div id="content-window"></div>
-    <div id="cc-icons"></div>
     <div id='slider'></div>
-    <div id='kml'></div>
 </body>
