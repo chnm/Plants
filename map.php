@@ -9,12 +9,15 @@
   #cc-key-window { width:29%; float: right; }
   #tool-window { width:69%; clear: left;}
   #content-window { width:100%;}
+  #slider { width: 69%; }
   .info-window h1 { font-size: 14px; }
   .info-window p { font-size: 12px; }
   .info-window table, .info-window td { font-size: 12px; border: 1px solid gray; }
 </style>
+<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
 
 <script type="text/javascript" src="http://code.jquery.com/jquery-1.4.3.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
 <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
 <script type="text/javascript">
 var kml;
@@ -72,7 +75,62 @@ $(document).ready(function() {
     $("#button-map-collector").click(function() {
         getSpecimens('collector');
     });
+    $("#button-slider-collection-year").click(function() {
+        setSlider();
+    });
+    $("#button-map-kml").click(function() {
+        mapKml();
+    });
 });
+
+function setSlider() {
+    $("#content-window").empty();
+    
+    // Get unique collection years.
+    var collectionYears = [];
+    $(kml).find("Data[name='collection_year']").each(function () {
+        var collectionYear = $(this).children('value').text();
+        if ($.inArray(collectionYear, collectionYears) == -1 && collectionYear.length > 0) {
+            collectionYears.push(parseInt(collectionYear));
+        }
+    });
+    
+    // Sort numerically.
+    collectionYears.sort(function(a, b) {
+        return a - b;
+    });
+    
+    // Set the minimum and maximum year for the slider.
+    $("#slider").slider({
+        min:collectionYears[0], 
+        max: collectionYears[collectionYears.length - 1]
+    });
+    
+    // Show collection year.
+    $("#slider").slider({
+        slide: function(event, ui) {
+            var sliderValue = $("#slider").slider("option", "value");
+            $("#content-window").text(sliderValue);
+            if ($.inArray(sliderValue, collectionYears) != -1) {
+                $("#content-window").append(" (specimens found)");
+            }
+        }
+    });
+    
+    // Map specimens collected in the specified year.
+    $("#slider").slider({
+        stop: function(event, ui) {
+            $("#cc-key-window").empty();
+            deleteMarkers();
+            var sliderValue = $("#slider").slider("option", "value");
+            $(kml).find("Placemark:has(Data[name='collection_year'])").each(function () {
+                if (sliderValue == $(this).find("Data[name='collection_year']").children("value").text()) {
+                    addMarker(this);
+                }
+            });
+        }
+    });
+}
 
 /**
  * Adds a marker to the map.
@@ -293,9 +351,10 @@ function colorCodeIcons(name) {
     <div id="map-canvas"></div>
     <div id="cc-key-window"></div>
     <div id="tool-window">
-        color code: <button id="button-cc-herbarium">herbariums</button><button id="button-cc-country">countries</button><button id="button-cc-collector">collectors</button>
-        map: <button id="button-map-herbarium">herbariums</button><button id="button-map-collection-year">collection years</button><button id="button-map-country">countries</button><button id="button-map-collector">collectors</button>
+        Get all <button id="button-map-herbarium">herbariums</button><button id="button-map-country">countries</button><button id="button-map-collector">collectors</button><br />
+        Color code <button id="button-cc-herbarium">herbariums</button><button id="button-cc-country">countries</button><button id="button-cc-collector">collectors</button><br />
+        <button id="button-slider-collection-year">collection year slider</button> <button id="button-map-kml">reset map</button>
     </div>
-    <div id="content-window"></div>
     <div id='slider'></div>
+    <div id="content-window"></div>
 </body>
