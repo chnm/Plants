@@ -5,7 +5,7 @@
 <style type="text/css">
   html { height: 100% }
   body { height: 100%; margin: 0px; padding: 0px }
-  #map-canvas { width:69%; height:70%; float: left; }
+  #map-canvas { width:69%; height:80%; float: left; }
   #cc-key-window { width:29%; float: right; }
   #tool-window { width:69%; clear: left;}
   #content-window { width:100%;}
@@ -83,6 +83,11 @@ $(document).ready(function() {
     });
 });
 
+/**
+ * Render the collection date slider.
+ * 
+ * @link http://docs.jquery.com/UI/Slider
+ */
 function setSlider() {
     $("#content-window").empty();
     
@@ -102,16 +107,16 @@ function setSlider() {
     
     // Set the minimum and maximum year for the slider.
     $("#slider").slider({
-        min:collectionYears[0], 
-        max: collectionYears[collectionYears.length - 1]
+        min: collectionYears[0], 
+        max: collectionYears[collectionYears.length - 1], 
+        animate: true
     });
     
     // Show collection year.
     $("#slider").slider({
         slide: function(event, ui) {
-            var sliderValue = $("#slider").slider("option", "value");
-            $("#content-window").text(sliderValue);
-            if ($.inArray(sliderValue, collectionYears) != -1) {
+            $("#content-window").text(ui.value);
+            if ($.inArray(ui.value, collectionYears) != -1) {
                 $("#content-window").append(" (specimens found)");
             }
         }
@@ -119,12 +124,11 @@ function setSlider() {
     
     // Map specimens collected in the specified year.
     $("#slider").slider({
-        stop: function(event, ui) {
+        change: function(event, ui) {
             $("#cc-key-window").empty();
             deleteMarkers();
-            var sliderValue = $("#slider").slider("option", "value");
             $(kml).find("Placemark:has(Data[name='collection_year'])").each(function () {
-                if (sliderValue == $(this).find("Data[name='collection_year']").children("value").text()) {
+                if (ui.value == $(this).find("Data[name='collection_year']").children("value").text()) {
                     addMarker(this);
                 }
             });
@@ -351,7 +355,7 @@ function colorCodeIcons(name) {
     <div id="map-canvas"></div>
     <div id="cc-key-window"></div>
     <div id="tool-window">
-        Get all <button id="button-map-herbarium">herbariums</button><button id="button-map-country">countries</button><button id="button-map-collector">collectors</button><br />
+        Get all <button id="button-map-herbarium">herbariums</button><button id="button-map-country">countries</button><button id="button-map-collector">collectors</button>
         Color code <button id="button-cc-herbarium">herbariums</button><button id="button-cc-country">countries</button><button id="button-cc-collector">collectors</button><br />
         <button id="button-slider-collection-year">collection year slider</button> <button id="button-map-kml">reset map</button>
     </div>
