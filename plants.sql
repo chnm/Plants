@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Oct 29, 2010 at 11:48 AM
+-- Generation Time: Nov 05, 2010 at 06:26 PM
 -- Server version: 5.1.41
 -- PHP Version: 5.3.2-1ubuntu4.5
 
@@ -110,8 +110,9 @@ CREATE TABLE `resources_geolocations` (
 CREATE TABLE `searches` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `jstor_url` text COLLATE utf8_unicode_ci NOT NULL,
-  `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `inserted` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `status` enum('Starting','In Process','Error','Completed') COLLATE utf8_unicode_ci NOT NULL,
+  `process_start` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `process_end` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
