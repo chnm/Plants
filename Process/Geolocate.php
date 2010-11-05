@@ -136,9 +136,19 @@ class Plants_Process_Geolocate
             $geolocationId = $this->_db->fetchOne($sql, $resource['id']);
             
             if ($geolocationId) {
-                $this->_db->insert('resources_geolocations', 
-                                   array('resource_id' => $resource['id'], 
-                                         'geolocation_id' => $geolocationId));
+                // Do not insert the resources_geolocations relationship if it 
+                // already exists in the database.
+                $sql = 'SELECT id 
+                        FROM resources_geolocations 
+                        WHERE resource_id = ? 
+                        AND geolocation_id = ?';
+                $resourceGeolocationExists = $this->_db->fetchOne($sql, array($resource['id'], 
+                                                                              $geolocationId));
+                if (!$resourceGeolocationExists) {
+                    $this->_db->insert('resources_geolocations', 
+                                       array('resource_id' => $resource['id'], 
+                                             'geolocation_id' => $geolocationId));
+                }
             }
         }
     }

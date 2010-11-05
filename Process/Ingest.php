@@ -66,12 +66,15 @@ class Plants_Process_Ingest
      * instead of ingesting it.
      * @return string|int The search ID or the total count of the result set.
      */
-    public function ingest($searchUrl, $returnTotalCount = false)
+    public function ingest($searchId, $returnTotalCount = false)
     {
+        $sql = 'SELECT * FROM searches WHERE id = ?';
+        $search = $this->_db->fetchRow($sql, $searchId);
+        
         /* SEARCH JSTOR */
         
         require_once 'Zend/Uri.php';
-        $uri = Zend_Uri::factory($searchUrl);
+        $uri = Zend_Uri::factory($search['jstor_url']);
         if (!preg_match('/=' . self::ID_RESOURCE_TYPE_SPECIMEN . '\b/', $uri->getQuery())) {
             throw new Exception('Invalid search. Only searches on "Resource Type: Specimens" will be geolocated.');
         }
@@ -139,20 +142,24 @@ class Plants_Process_Ingest
         // Require Zend_Db_Expr for SQL expressions.
         require_once 'Zend/Db/Expr.php';
         
-        // Save this search to the database.
-        $this->_db->insert('searches', array('jstor_url' => $searchUrl, 
-                                             'inserted' => new Zend_Db_Expr('NOW()')));
-        $searchId = $this->_db->lastInsertId();
-        
         // Iterate the resource DOIs.
         foreach ($dois as $doi) {
             
             // Do not ingest the resource if it already exists in the database.
             $sql = 'SELECT id FROM resources WHERE doi = ?';
-            $id = $this->_db->fetchOne($sql, $doi);
-            if ($id) {
-                $this->_db->insert('searches_resources', array('search_id' => $searchId, 
-                                                               'resource_id' => $id));
+            $rId = $this->_db->fetchOne($sql, $doi);
+            if ($rId) {
+                // Do not insert the searches_resources relationship if it 
+                // already exists in the database.
+                $sql = 'SELECT id 
+                        FROM searches_resources 
+                        WHERE search_id = ? 
+                        AND resource_id = ?';
+                $srId = $this->_db->fetchOne($sql, array($searchId, $rId));
+                if (!$srId) {
+                    $this->_db->insert('searches_resources', array('search_id' => $searchId, 
+                                                                   'resource_id' => $rId));
+                }
                 continue;
             }
             
@@ -235,7 +242,5 @@ class Plants_Process_Ingest
             $this->_db->insert('searches_resources', array('search_id' => $searchId, 
                                                            'resource_id' => $this->_db->lastInsertId()));;
         }
-        
-        return $searchId;
     }
 }
