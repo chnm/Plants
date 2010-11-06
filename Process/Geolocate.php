@@ -135,16 +135,28 @@ class Plants_Process_Geolocate
                     LIMIT 1';
             $geolocationId = $this->_db->fetchOne($sql, $resource['id']);
             
+            // Save the resource/geolocation relationship if a valid geolocation 
+            // is found.
             if ($geolocationId) {
-                // Do not insert the resources_geolocations relationship if it 
-                // already exists in the database.
+                
+                // Check to see if a resource/geolocation relationship already 
+                // exists for the resource.
                 $sql = 'SELECT id 
                         FROM resources_geolocations 
-                        WHERE resource_id = ? 
-                        AND geolocation_id = ?';
-                $resourceGeolocationExists = $this->_db->fetchOne($sql, array($resource['id'], 
-                                                                              $geolocationId));
-                if (!$resourceGeolocationExists) {
+                        WHERE resource_id = ?';
+                $resourceGeolocationExists = $this->_db->fetchOne($sql, $resource['id']);
+                
+                // Update the geolocation ID if a resource/geolocation 
+                // relationship already exists. This way more geolocation 
+                // services can be added that rank higher than an existing 
+                // relationship.
+                if ($resourceGeolocationExists) {
+                    $this->_db->update('resources_geolocations', 
+                                       array('geolocation_id' => $geolocationId), 
+                                       'resource_id = ' . $resource['id']);
+                
+                // Insert a new resource/geolocation relationship.
+                } else {
                     $this->_db->insert('resources_geolocations', 
                                        array('resource_id' => $resource['id'], 
                                              'geolocation_id' => $geolocationId));

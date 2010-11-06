@@ -98,8 +98,9 @@ CREATE TABLE `resources_geolocations` (
   `resource_id` int(10) unsigned NOT NULL,
   `geolocation_id` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `resource_id` (`resource_id`,`geolocation_id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+  UNIQUE KEY `resource_id` (`resource_id`,`geolocation_id`),
+  UNIQUE KEY `resource_id_2` (`resource_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -110,7 +111,7 @@ CREATE TABLE `resources_geolocations` (
 CREATE TABLE `searches` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `jstor_url` text COLLATE utf8_unicode_ci NOT NULL,
-  `status` enum('Starting','In Process','Error','Completed') COLLATE utf8_unicode_ci NOT NULL,
+  `status` enum('Starting','In Process','Error','Completed') COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Starting',
   `process_start` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   `process_end` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`id`)
