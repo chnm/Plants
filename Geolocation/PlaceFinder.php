@@ -17,7 +17,7 @@ class Plants_Geolocation_PlaceFinder implements Plants_Geolocation_Interface
     {
         require_once 'Zend/Http/Client.php';
         $this->_client = new Zend_Http_Client(self::URL);
-        $this->_client->setConfig(array('keepalive' => true, 'timeout' => 100));
+        $this->_client->setConfig(array('keepalive' => true));
         $this->_client->setParameterGet('flags', 'J'); // JSON format
     }
     
