@@ -9,7 +9,6 @@
 class Plants_Process_Kml extends XMLWriter
 {
     private $_db;
-    private $_services;
     private $_extendedData = array('locality'        => 'Locality', 
                                    'country'         => 'Country', 
                                    'herbarium'       => 'Herbarium', 
@@ -26,13 +25,6 @@ class Plants_Process_Kml extends XMLWriter
     public function __construct(Zend_Db_Adapter_Abstract $db)
     {
         $this->_db = $db;
-        
-        // Get all geolocation services by rank. [rank] => [id]
-        $sql = 'SELECT rank, id 
-                FROM geolocation_services 
-                ORDER BY rank';
-        $this->_services = $this->_db->fetchPairs($sql);
-        
     }
     
     /**
@@ -43,7 +35,7 @@ class Plants_Process_Kml extends XMLWriter
      * @param bool $xmlContentType Whether to include a text/xml content type
      * header prior to XML output.
      */
-    public function write($searchId, $limit = 200, $xmlContentType = false)
+    public function write($searchId, $limit = 2000, $offset = 0, $xmlContentType = false)
     {
         /* GET GEOLOCATION DATA */
         
@@ -57,8 +49,8 @@ class Plants_Process_Kml extends XMLWriter
                 JOIN geolocations g 
                 ON rg.geolocation_id = g.id 
                 WHERE sr.search_id = ? 
-                LIMIT ?';
-        $resources = $this->_db->fetchAll($sql, array($searchId, $limit));
+                LIMIT ?, ?';
+        $resources = $this->_db->fetchAll($sql, array($searchId, $offset, $limit));
         
         // Begin building the array containing valid geolocations for this search.
         $geolocations = array();
