@@ -111,6 +111,7 @@ CREATE TABLE `resources_geolocations` (
 CREATE TABLE `searches` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `jstor_url` text COLLATE utf8_unicode_ci NOT NULL,
+  `description` text COLLATE utf8_unicode_ci,
   `status` enum('Starting','In Process','Error','Completed') COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Starting',
   `process_start` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   `process_end` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
