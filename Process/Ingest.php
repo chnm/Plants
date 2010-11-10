@@ -129,7 +129,7 @@ class Plants_Process_Ingest
         
         // Parse the XLS file and set the JSTOR DOIs of the previous search.
         // See: http://phpexcel.codeplex.com/
-        require_once 'PHPExcel/IOFactory.php';
+        require_once 'Plants/PHPExcel/IOFactory.php';
         $sheet = PHPExcel_IOFactory::load($tempFile)->getActiveSheet();
         fclose($fileHandle);
         $dois = array();
