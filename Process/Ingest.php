@@ -59,14 +59,32 @@ class Plants_Process_Ingest
     }
     
     /**
+     * Returns the total count of a JSTOR search result set.
+     * 
+     * @param string $jstorUrl The JSTOR search URL.
+     * @return int The total count.
+     */
+    public function getTotalCount($jstorUrl)
+    {
+        $this->_client->setUri($jstorUrl);
+        $response = $this->_client->request();
+        $this->_client->resetParameters();
+        
+        $doc = new DOMDocument();
+        $doc->loadHTML($response->getBody());
+        $xpath = new DOMXpath($doc);
+        // Firefox adds tbody so don't include it in the XPath.
+        $results = $xpath->query('/html/body/table/tr[2]/td[3]/article/nav');
+        preg_match('/^\s+([\d,]+) Results/', $results->item(0)->nodeValue, $matches);
+        return (int) @str_replace(',', '', $matches[1]);
+    }
+    
+    /**
      * Search JSTOR and ingest the results.
      * 
-     * @param string $searchUrl The URL of a JSTOR search results page.
-     * @param bool $returnTotalCount Return the total count of the result set 
-     * instead of ingesting it.
-     * @return string|int The search ID or the total count of the result set.
+     * @param string $searchId The search ID.
      */
-    public function ingest($searchId, $returnTotalCount = false)
+    public function ingest($searchId)
     {
         $sql = 'SELECT * FROM searches WHERE id = ?';
         $search = $this->_db->fetchRow($sql, $searchId);
@@ -86,17 +104,6 @@ class Plants_Process_Ingest
         $this->_client->getUri()->setQuery($uri->getQuery());
         $response = $this->_client->request();
         $this->_client->resetParameters();
-        
-        // Return total count if desired.
-        if ($returnTotalCount) {
-            $doc = new DOMDocument();
-            $doc->loadHTML($response->getBody());
-            $xpath = new DOMXpath($doc);
-            // Firefox adds tbody so don't include it in the XPath.
-            $results = $xpath->query('/html/body/table/tr[2]/td[3]/article/nav');
-            preg_match('/^\s+([\d,]+) Results/', $results->item(0)->nodeValue, $matches);
-            return (int) @str_replace(',', '', $matches[1]);
-        }
         
         /* LOGIN TO JSTOR*/
         
