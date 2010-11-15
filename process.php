@@ -34,7 +34,20 @@ try {
 // Something went wrong.
 } catch (Exception $e) {
     
-    // log errors here.
+    // Log errors.
+    $fp = fopen('errorlog', 'a');
+    fwrite($fp, "\n$e\n");
+    
+    // Reestablish a database connection if it has been disconnected.
+    if (!$db->isConnected()) {
+        $db = Zend_Db::factory('Mysqli', array(
+            'host'     => DB_HOST, 
+            'username' => DB_USERNAME, 
+            'password' => DB_PASSWORD, 
+            'dbname'   => DB_DBNAME, 
+            'charset'  => 'utf8', // must include utf8 charset
+        ));
+    }
     
     $db->update('searches', 
                 array('status' => 'Error'), 
