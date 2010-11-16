@@ -30,7 +30,7 @@ class Plants_Process_Geolocate
     public function geolocate($searchId)
     {
         // Find all geolocation services
-        $sql = 'SELECT * FROM geolocation_services';
+        $sql = 'SELECT * FROM geolocation_services WHERE id = 2';
         $geolocationServices = $this->_db->fetchAll($sql);
         
         // Iterate the geolocation services.
@@ -50,14 +50,14 @@ class Plants_Process_Geolocate
         }
         
         // Find all resources in this search.
-        $sql = 'SELECT r.id, r.locality, r.country 
+        $sql = 'SELECT r.id, r.locality, r.country_name 
                 FROM resources r 
                 JOIN searches_resources sr 
                 ON r.id = sr.resource_id
                 WHERE sr.search_id = ? 
                 AND (
                     r.locality IS NOT NULL 
-                    OR r.country IS NOT NULL 
+                    OR r.country_name IS NOT NULL 
                 )';
         $resources = $this->_db->fetchAll($sql, $searchId);
         
@@ -66,16 +66,6 @@ class Plants_Process_Geolocate
         
         // Iterate all resources in this search.
         foreach ($resources as $resource) {
-            
-            // Set the query string.
-            $queryParts = array();
-            if ($resource['locality']) {
-                $queryParts[] = $resource['locality'];
-            }
-            if ($resource['country']) {
-                $queryParts[] = $resource['country'];
-            }
-            $query = implode(', ', $queryParts);
             
             // Iterate all geolocation services for each resource.
             foreach ($services as $serviceId => $service) {
@@ -98,7 +88,7 @@ class Plants_Process_Geolocate
                 // errors here. Ignore and continue. Hopefully it will work 
                 // next time this resource is geolocated.
                 try {
-                    $service->query($query, 1);
+                    $service->query($resource['locality'], $resource['country_name']);
                 } catch (Exception $e) {
                     continue;
                 }
@@ -106,8 +96,6 @@ class Plants_Process_Geolocate
                 // Set the geolocation array.
                 $geolocation = array('resource_id'            => $resource['id'], 
                                      'geolocation_service_id' => $serviceId, 
-                                     'request_uri'            => $service->getRequestUri(), 
-                                     'response'               => $service->getResponse(), 
                                      'inserted'               => new Zend_Db_Expr('NOW()'));
                 
                 // Set the latitude and longitude if they exist. If there 
@@ -115,8 +103,8 @@ class Plants_Process_Geolocate
                 // This will prevent future queries to this geolocation 
                 // service for this resource.
                 if ($service->getTotalCount()) {
-                    $geolocation['latitude'] = $service->getLatitude(0);
-                    $geolocation['longitude'] = $service->getLongitude(0);
+                    $geolocation['latitude'] = $service->getLatitude();
+                    $geolocation['longitude'] = $service->getLongitude();
                 }
                 
                 $this->_db->insert('geolocations', $geolocation);

@@ -11,7 +11,10 @@ class Plants_Geolocation_PlaceFinder implements Plants_Geolocation_Interface
     const URL = 'http://where.yahooapis.com/geocode';
     
     private $_client;
-    private $_result;
+    private $_responses = array();
+    private $_totalCount;
+    private $_latitude;
+    private $_longitude;
     
     public function __construct()
     {
@@ -21,51 +24,76 @@ class Plants_Geolocation_PlaceFinder implements Plants_Geolocation_Interface
         $this->_client->setParameterGet('flags', 'J'); // JSON format
     }
     
-    public function query($location, $limit)
+    public function query($location, $country = null)
     {
-        // The "count" control parameter does not work as of 2010/10/20. 
-        // PlaceFinder returns all results.
-        $this->_client->setParameterGet('count', $limit);
-        $this->_client->setParameterGet('q', $location);
-        $response = $this->_client->request();
-        $this->_result = json_decode($response->getBody());
-    }
-    
-    public function getRequestUri()
-    {
-        preg_match('/GET (.+) /', $this->_client->getLastRequest(), $matches);
-        return $matches[1];
-    }
-    
-    public function getResponse()
-    {
-        return $this->_client->getLastResponse()->getBody();
+        // There was a response with a country match.
+        if ($this->_set($location, $country)) {
+            return;
+        }
+        
+        // There was at least one response, but no country matches. Set the 
+        // coordinates from the first result.
+        if ($this->_responses) {
+            $this->_totalCount = $this->_responses[0]->ResultSet->Found;
+            $this->_latitude = $this->_responses[0]->ResultSet->Results[0]->latitude;
+            $this->_longitude = $this->_responses[0]->ResultSet->Results[0]->longitude;
+            return;
+        }
+        
+        // There were no results for all queries.
+        $this->_totalCount = 0;
     }
     
     public function getTotalCount()
     {
-        return $this->_result->ResultSet->Found;
+        return $this->_totalCount;
     }
     
-    public function getLatitude($index)
+    public function getLatitude()
     {
-        return $this->_result->ResultSet->Results[$index]->latitude;
+        return $this->_latitude;
     }
     
-    public function getLongitude($index)
+    public function getLongitude()
     {
-        return $this->_result->ResultSet->Results[$index]->longitude;
+        return $this->_longitude;
     }
     
-    public function getLocation($index)
+    private function _set($location, $country)
     {
-        $result = $this->_result->ResultSet->Results[$index];
-        $name = array(trim($result->neighborhood), 
-                      trim($result->city), 
-                      trim($result->county), 
-                      trim($result->state), 
-                      trim($result->country));
-        $name = array_filter($name);
-        return implode(' ', $name);
+        // Reset the responses.
+        $this->_responses = array();
+        
+        // Set the queries in priority order.
+        $queries = array("$location $country", $location, $country);
+        
+        // Iterate the queries.
+        foreach ($queries as $query) {
+            
+            // Make the request.
+            $this->_client->setParameterGet('q', trim($query));
+            $response = json_decode($this->_client->request()->getBody());
+            
+            // Continue to the next query if there are no results.
+            if (!$response->ResultSet->Found) {
+                continue;
+            }
+            
+            // Set the responses.
+            $this->_responses[] = $response;
+            
+            // Set the coordinates from the first result with a matching country.
+            foreach ($response->ResultSet->Results as $result) {
+                if (strstr($country, $result->country)) {
+                    $this->_totalCount = $response->ResultSet->Found;
+                    $this->_latitude = $result->latitude;
+                    $this->_longitude = $result->longitude;
+                    return true;
+                }
+            }
+        }
+        
+        // No matching countries found for all queries.
+        return false;
     }
 }
