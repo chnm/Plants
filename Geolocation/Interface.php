@@ -32,4 +32,11 @@ interface Plants_Geolocation_Interface
      * @return string The longitude. Don't return float due to lack of precision.
      */
     public function getLongitude();
+    
+    /**
+     * Get the request URI from the request that set the coordinates.
+     * 
+     * @return string The request URI.
+     */
+    public function getRequestUri();
 }

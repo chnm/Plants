@@ -105,6 +105,7 @@ class Plants_Process_Geolocate
                 if ($service->getTotalCount()) {
                     $geolocation['latitude'] = $service->getLatitude();
                     $geolocation['longitude'] = $service->getLongitude();
+                    $geolocation['request_uri'] = $service->getRequestUri();
                 }
                 
                 $this->_db->insert('geolocations', $geolocation);

@@ -25,11 +25,12 @@ CREATE TABLE `geolocations` (
   `geolocation_service_id` int(10) unsigned NOT NULL,
   `latitude` text COLLATE utf8_unicode_ci,
   `longitude` text COLLATE utf8_unicode_ci,
+  `request_uri` text COLLATE utf8_unicode_ci,
   `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `inserted` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`id`),
   UNIQUE KEY `resource_id` (`resource_id`,`geolocation_service_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 
