@@ -24,7 +24,7 @@ class Plants_Geolocation_PlaceFinder implements Plants_Geolocation_Interface
         $this->_client->setParameterGet('flags', 'J'); // JSON format
     }
     
-    public function query($location, $country = null)
+    public function query($location, $country)
     {
         
         // Set the queries in priority order.
@@ -34,7 +34,7 @@ class Plants_Geolocation_PlaceFinder implements Plants_Geolocation_Interface
         foreach ($queries as $query) {
             
             // Make the request.
-            $this->_client->setParameterGet('q', trim($query));
+            $this->_client->setParameterGet('q', $query);
             $response = json_decode($this->_client->request()->getBody());
             
             // Continue to the next query if there are no results.

@@ -10,7 +10,7 @@ interface Plants_Geolocation_Interface
      * @param string $location The string to geolocate.
      * @param int $limit The maximum number of geolocation results.
      */
-    public function query($location, $country = null);
+    public function query($location, $country);
     
     /**
      * Get the total count of the query results.

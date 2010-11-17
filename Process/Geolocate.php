@@ -30,7 +30,7 @@ class Plants_Process_Geolocate
     public function geolocate($searchId)
     {
         // Find all geolocation services
-        $sql = 'SELECT * FROM geolocation_services WHERE id = 2';
+        $sql = 'SELECT * FROM geolocation_services';
         $geolocationServices = $this->_db->fetchAll($sql);
         
         // Iterate the geolocation services.

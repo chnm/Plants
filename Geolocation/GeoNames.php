@@ -11,7 +11,10 @@ class Plants_Geolocation_GeoNames implements Plants_Geolocation_Interface
     const URL = 'http://ws.geonames.org/search';
     
     private $_client;
-    private $_result;
+    private $_totalCount;
+    private $_latitude;
+    private $_longitude;
+    private $_requestUri;
     
     public function __construct()
     {
@@ -21,47 +24,75 @@ class Plants_Geolocation_GeoNames implements Plants_Geolocation_Interface
         $this->_client->setParameterGet('type', 'json');
     }
     
-    public function query($location, $limit)
+    public function query($location, $country)
     {
-        $this->_client->setParameterGet('maxRows', $limit);
-        $this->_client->setParameterGet('q', $location);
-        $response = $this->_client->request();
-        $this->_result = json_decode($response->getBody());
-    }
-    
-    public function getRequestUri()
-    {
-        preg_match('/GET (.+) /', $this->_client->getLastRequest(), $matches);
-        return $matches[1];
-    }
-    
-    public function getResponse()
-    {
-        return $this->_client->getLastResponse()->getBody();
+        
+        // Set the queries in priority order.
+        $queries = array("$location $country", $location, $country);
+        
+        // Iterate the queries.
+        foreach ($queries as $query) {
+            
+            // Make the request.
+            $this->_client->setParameterGet('q', $query);
+            $response = json_decode($this->_client->request()->getBody());
+            
+            // Continue to the next query if there are no results.
+            if (!$response->totalResultsCount) {
+                continue;
+            }
+            
+            // Set the first response with results.
+            if (!isset($firstResponse)) {
+                $firstResponse = $response;
+                $firstRequest = $this->_client->getLastRequest();
+            }
+            
+            // Set the coordinates from the first result with a matching country.
+            foreach ($response->geonames as $result) {
+                if (strstr($country, $result->countryName)) {
+                    $this->_totalCount = $response->totalResultsCount;
+                    $this->_latitude = $result->lat;
+                    $this->_longitude = $result->lng;
+                    preg_match('/GET (.+) /', $this->_client->getLastRequest(), $matches);
+                    $this->_requestUri = $matches[1];
+                    return;
+                }
+            }
+        }
+        
+        // There was at least one response, but no country matches. Set the 
+        // coordinates from the first result.
+        if (isset($firstResponse)) {
+            $this->_totalCount = $firstResponse->totalResultsCount;
+            $this->_latitude = $firstResponse->geonames[0]->lat;
+            $this->_longitude = $firstResponse->geonames[0]->lng;
+            preg_match('/GET (.+) /', $firstRequest, $matches);
+            $this->_requestUri = $matches[1];
+            return;
+        }
+        
+        // There were no results for all queries.
+        $this->_totalCount = 0;
     }
     
     public function getTotalCount()
     {
-        return $this->_result->totalResultsCount;
+        return $this->_totalCount;
     }
     
-    public function getLatitude($index)
+    public function getLatitude()
     {
-        return $this->_result->geonames[$index]->lat;
+        return $this->_latitude;
     }
     
-    public function getLongitude($index)
+    public function getLongitude()
     {
-        return $this->_result->geonames[$index]->lng;
+        return $this->_longitude;
     }
     
-    public function getLocation($index)
+    public function getRequestUri()
     {
-        $result = $this->_result->geonames[$index];
-        $name = array(trim($result->name), 
-                      trim($result->adminName1), 
-                      trim($result->countryName));
-        $name = array_filter($name);
-        return implode(' ', $name);
+        return $this->_requestUri;
     }
 }
