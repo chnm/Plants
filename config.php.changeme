@@ -28,9 +28,10 @@ set_include_path(get_include_path()
 // Set the database object.
 require_once 'Zend/Db.php';
 $db = Zend_Db::factory('Mysqli', array(
-    'host'     => DB_HOST, 
-    'username' => DB_USERNAME, 
-    'password' => DB_PASSWORD, 
-    'dbname'   => DB_DBNAME, 
-    'charset'  => 'utf8', // must include utf8 charset
+    'host'       => DB_HOST, 
+    'username'   => DB_USERNAME, 
+    'password'   => DB_PASSWORD, 
+    'dbname'     => DB_DBNAME, 
+    'persistent' => true, // Set to persistant connection
+    'charset'    => 'utf8', // must include utf8 charset
 ));
