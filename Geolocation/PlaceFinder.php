@@ -50,7 +50,7 @@ class Plants_Geolocation_PlaceFinder implements Plants_Geolocation_Interface
             
             // Set the coordinates from the first result with a matching country.
             foreach ($response->ResultSet->Results as $result) {
-                if (strstr($country, $result->country)) {
+                if (isset($result->country) && @strstr($country, $result->country)) {
                     $this->_totalCount = $response->ResultSet->Found;
                     $this->_latitude = $result->latitude;
                     $this->_longitude = $result->longitude;

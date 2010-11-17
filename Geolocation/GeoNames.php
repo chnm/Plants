@@ -50,7 +50,7 @@ class Plants_Geolocation_GeoNames implements Plants_Geolocation_Interface
             
             // Set the coordinates from the first result with a matching country.
             foreach ($response->geonames as $result) {
-                if (strstr($country, $result->countryName)) {
+                if (isset($result->countryName) && @strstr($country, $result->countryName)) {
                     $this->_totalCount = $response->totalResultsCount;
                     $this->_latitude = $result->lat;
                     $this->_longitude = $result->lng;

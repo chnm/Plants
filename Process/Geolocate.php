@@ -11,6 +11,101 @@ class Plants_Process_Geolocate
     const CLASS_PREFIX = 'Plants_Geolocation_';
     
     private $_db;
+    private $_stopWords = array();
+    private $_stopWordsDelimited = '
+southwest of
+northwest of
+southeast of
+northeast of
+south of
+north of
+east of
+west of
+N
+S
+E
+W
+NE
+NW
+SE
+SW
+from
+to
+above
+below
+vicinity of
+the headwaters of
+on rocky banks
+on rocks
+hillside
+slope of
+toward
+summit of
+the summit
+summit camp
+trail to summit
+below summit
+turnoff to summit
+vicinity of summit
+slopes and summit of
+vicinity
+approach from
+approach to
+highest point of
+cloud forest
+rain forest
+virgin forest
+montane rain forest
+montane forest
+elfin woods
+forested
+along
+connecting with
+along trail
+along road
+along rd
+suroeste de
+noroeste de
+sureste de
+noreste de
+sur de
+norte de
+este de
+oeste de
+mogote de
+encima
+abajo
+In the forest of
+Dans les ravins chez les
+Near
+Way to
+De/ à
+Route de
+Environs de
+Entre/ et
+Between/and
+and viccinity
+du chemin de fer
+dans la foret aux environs de
+Croît dans les forêts de
+Croît dans les gorges des montagnes des environs de
+près des ravins du
+Dans les sables du
+Montagnes arides du
+Bords du
+Forêts fertiles du
+Basfonds inondés près du
+Sur les bords de
+Pays des
+Cercle de/entre/de
+Vallée de
+Main road from
+Bassin du
+Plains of
+Croit sur les rochers, près des eaux couvantes du pays des
+in
+to
+from base of';
     
     /**
      * Construct the geolocate object.
@@ -20,6 +115,7 @@ class Plants_Process_Geolocate
     public function __construct(Zend_Db_Adapter_Abstract $db)
     {
         $this->_db = $db;
+        $this->_setStopWords();
     }
     
     /**
@@ -67,6 +163,8 @@ class Plants_Process_Geolocate
         // Iterate all resources in this search.
         foreach ($resources as $resource) {
             
+            $locality = $this->_filterLocality($resource['locality']);
+            
             // Iterate all geolocation services for each resource.
             foreach ($services as $serviceId => $service) {
                 
@@ -88,7 +186,7 @@ class Plants_Process_Geolocate
                 // errors here. Ignore and continue. Hopefully it will work 
                 // next time this resource is geolocated.
                 try {
-                    $service->query($resource['locality'], $resource['country_name']);
+                    $service->query($locality, $resource['country_name']);
                 } catch (Exception $e) {
                     continue;
                 }
@@ -152,5 +250,61 @@ class Plants_Process_Geolocate
                 }
             }
         }
+    }
+    
+    /**
+     * Set the stop words to be parsable.
+     */
+    private function _setStopWords()
+    {
+        // Explode the stop words by newline.
+        $stopWords = explode("\n", $this->_stopWordsDelimited);
+        // Trim every element. Having problems trimming some whitespace 
+        // characters.
+        array_walk($stopWords, 'trim');
+        // Filter out empty elements.
+        $stopWords = array_filter($stopWords);
+        // Order array by string length, longest first.
+        usort($stopWords, array($this, 'cmpStopWords'));
+        $this->_stopWords = $stopWords;
+    }
+    
+    /**
+     * String comparisom callback that orders an array by string length, longest 
+     * first.
+     * 
+     * @param string $a
+     * @param string $b
+     * @return int
+     */
+    private function cmpStopWords($a, $b)
+    {
+        if ($a == $b) {
+            return 0;
+        }
+        return mb_strlen($a, 'utf8') > mb_strlen($b, 'utf8') ? -1 : 1;
+    }
+    
+    /**
+     * Filter stopwords, punctuation, and unneeded spaces from locality string.
+     * 
+     * @param string $locality The locality to be filtered.
+     * @return string The filtered locality.
+     */
+    private function _filterLocality($locality)
+    {
+        $locality = trim($locality);
+        
+        // Remove stop words.
+        foreach ($this->_stopWords as $stopWord) {
+            $locality = preg_replace('/\b' . preg_quote($stopWord, '/') . '\b/u', '', $locality);
+        }
+        
+        // Remove punctuation.
+        $locality = preg_replace('/\p{P}/', '', $locality);
+        
+        // Remove unneeded spaces.
+        $locality = preg_replace('/  /', ' ', $locality);
+        return $locality;
     }
 }
