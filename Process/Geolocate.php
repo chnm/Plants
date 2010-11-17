@@ -300,11 +300,9 @@ from base of';
             $locality = preg_replace('/\b' . preg_quote($stopWord, '/') . '\b/u', '', $locality);
         }
         
-        // Remove punctuation.
-        $locality = preg_replace('/\p{P}/', '', $locality);
-        
         // Remove unneeded spaces.
-        $locality = preg_replace('/  /', ' ', $locality);
+        $locality = preg_replace('/\s\s+/', ' ', $locality);
+        
         return $locality;
     }
 }
