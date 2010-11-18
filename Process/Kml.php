@@ -14,7 +14,8 @@ class Plants_Process_Kml extends XMLWriter
                                    'herbarium'       => 'Herbarium', 
                                    'collector'       => 'Collector', 
                                    'collection_year' => 'Collection Year', 
-                                   'collection_date' => 'Collection Date');
+                                   'collection_date' => 'Collection Date', 
+                                   'doi'             => 'DOI');
 
     
     /**
@@ -75,6 +76,7 @@ class Plants_Process_Kml extends XMLWriter
                                     'longitude'       => $resource['longitude'], 
                                     'notes'           => $resource['notes'], 
                                     'identifications' => $resource['identifications'], 
+                                    'doi'             => $resource['doi'], 
                                     'url'             => $url);
         }
         
