@@ -51,7 +51,7 @@ class Plants_Geolocation_Nominatim implements Plants_Geolocation_Interface
             
             // Set the coordinates from the first result with a matching country.
             foreach ($response as $result) {
-                if (isset($result->address->country) && @strstr($country, $result->address->country)) {
+                if (isset($result->address->country) && false !== @strpos($country, $result->address->country)) {
                     $this->_totalCount = count($response);
                     $this->_latitude = $result->lat;
                     $this->_longitude = $result->lon;
