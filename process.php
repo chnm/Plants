@@ -2,73 +2,52 @@
 // Require the configuration file.
 require 'config.php';
 
-// Fetch the search.
-$sql = 'SELECT * FROM searches WHERE id = ?';
-// $argv[2] is: $ php process.php -s {search ID}
-$search = $db->fetchRow($sql, $argv[2]);
-
-// Set the status to 'In Process'.
-$db->update('searches', 
-            array('status' => 'In Process'), 
-            'id = ' . $search['id']);
-
 try {
+    // Fetch the search.
+    $sql = 'SELECT * FROM searches WHERE id = ?';
+    // $argv[2] is: $ php process.php -s {search ID}
+    $search = $db->fetchRow($sql, $argv[2]);
+    // Set the status to 'In Process'.
+    $db->update('searches', 
+                array('status' => 'In Process'), 
+                'id = ' . $search['id']);
     
-    process($db, $search['id']);
-    
-// Handle "Unable to read response, or response is empty" errors.
-} catch (Zend_Http_Client_Exception $e) {
-    
-    // Attempt the process another two times then error out. There must be a 
-    // better way to do this.
-    try {
-        process($db, $search['id']);
-    } catch (Zend_Http_Client_Exception $e) {
+    $attempt= 1;
+    while (true) {
         try {
-            process($db, $search['id']);
-        } catch (Exception $e) {
+            // Ingest process.
+            require_once 'Plants/Process/Ingest.php';
+            $ingest = new Plants_Process_Ingest($db, JSTOR_USERNAME, JSTOR_PASSWORD);
+            $ingest->ingest($search['id']);
+            
+            // Geolocation process.
+            require_once 'Plants/Process/Geolocate.php';
+            $geolocate = new Plants_Process_Geolocate($db);
+            $geolocate->geolocate($search['id']);
+            
+            // Set the status to 'Completed'.
+            $db->update('searches', 
+                        array('status' => 'Completed', 
+                              'process_end' => new Zend_Db_Expr('NOW()')), 
+                       'id = ' . $search['id']);
+            break;
+        // Attempt the process three times for "Unable to read response, or 
+        // response is empty" errors. 
+        } catch (Zend_Http_Client_Exception $e) {
+            $attempt++;
+            if (3 >= $attempt) {
+                continue;
+            }
+            // Throw Zend_Http_Client_Exception after three attempts.
             throw $e;
         }
     }
-    
-// Something went wrong.
 } catch (Exception $e) {
-    
     // Log errors.
-    $fp = fopen('errorlog', 'a');
-    fwrite($fp, "\n$e\n");
-    
-    // Reestablish a database connection if it has been disconnected.
-    if (!$db->isConnected()) {
-        $db = Zend_Db::factory('Mysqli', array(
-            'host'     => DB_HOST, 
-            'username' => DB_USERNAME, 
-            'password' => DB_PASSWORD, 
-            'dbname'   => DB_DBNAME, 
-            'charset'  => 'utf8', // must include utf8 charset
-        ));
-    }
+    $fp = @fopen(FILEPATH_ERRORLOG, 'a');
+    @fwrite($fp, "\n$e\n");
     
     $db->update('searches', 
                 array('status' => 'Error'), 
                 'id = ' . $search['id']);
-}
-
-function process($db, $searchId)
-{
-    // Ingest process.
-    require_once 'Plants/Process/Ingest.php';
-    $ingest = new Plants_Process_Ingest($db, JSTOR_USERNAME, JSTOR_PASSWORD);
-    $ingest->ingest($searchId);
-    
-    // Geolocation process.
-    require_once 'Plants/Process/Geolocate.php';
-    $geolocate = new Plants_Process_Geolocate($db);
-    $geolocate->geolocate($searchId);
-    
-    // Set the status to 'Completed'.
-    $db->update('searches', 
-                array('status' => 'Completed', 
-                      'process_end' => new Zend_Db_Expr('NOW()')), 
-               'id = ' . $searchId);
 }

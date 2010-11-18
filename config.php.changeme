@@ -7,6 +7,9 @@ define('PATH_ZEND', '');
 // Path from root to directory containing Plants library (Git working tree).
 define('PATH_PLANTS', '');
 
+// Path from root to errorlog file.
+define('FILEPATH_ERRORLOG', '');
+
 // Database connection configuration.
 define('DB_HOST', '');
 define('DB_USERNAME', '');
