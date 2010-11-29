@@ -47,6 +47,10 @@ try {
     $fp = @fopen(FILEPATH_ERRORLOG, 'a');
     @fwrite($fp, "\n$e\n");
     
+    if (!$db->isConnected()) {
+        $db = getDb();
+    }
+    
     $db->update('searches', 
                 array('status' => 'Error'), 
                 'id = ' . $search['id']);
